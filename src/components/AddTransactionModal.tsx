@@ -504,8 +504,8 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
               />
             </View>
 
-            {/* Date Selection with Calendar support */}
-            <Text style={styles.inputLabel}>WAKTU TRANSAKSI</Text>
+            {/* Simplified Date Selection */}
+            <Text style={styles.inputLabel}>TANGGAL TRANSAKSI</Text>
             <View style={styles.dateRow}>
               <TouchableOpacity
                 style={[
@@ -514,14 +514,9 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
                 ]}
                 onPress={() => {
                   setDateOption('today');
-                  setShowDatePicker(false);
+                  setCustomDate(toDateString(new Date()));
                 }}
               >
-                <Ionicons
-                  name="today-outline"
-                  size={14}
-                  color={dateOption === 'today' ? '#FFFFFF' : Colors.textSecondary}
-                />
                 <Text
                   style={[
                     styles.dateChipText,
@@ -539,14 +534,11 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
                 ]}
                 onPress={() => {
                   setDateOption('yesterday');
-                  setShowDatePicker(false);
+                  const y = new Date();
+                  y.setDate(y.getDate() - 1);
+                  setCustomDate(toDateString(y));
                 }}
               >
-                <Ionicons
-                  name="time-outline"
-                  size={14}
-                  color={dateOption === 'yesterday' ? '#FFFFFF' : Colors.textSecondary}
-                />
                 <Text
                   style={[
                     styles.dateChipText,
@@ -557,7 +549,6 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
                 </Text>
               </TouchableOpacity>
 
-              {/* Custom Calendar Date Chip */}
               <TouchableOpacity
                 style={[
                   styles.dateChip,
@@ -565,99 +556,48 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
                 ]}
                 onPress={() => {
                   setDateOption('custom');
-                  setShowDatePicker((prev) => !prev);
                 }}
               >
-                <Ionicons
-                  name="calendar-outline"
-                  size={14}
-                  color={dateOption === 'custom' ? '#FFFFFF' : Colors.textSecondary}
-                />
                 <Text
                   style={[
                     styles.dateChipText,
                     dateOption === 'custom' && styles.dateChipTextActive,
                   ]}
                 >
-                  {dateOption === 'custom' ? customDate : 'Pilih Tanggal...'}
+                  2 Hari Lalu
                 </Text>
               </TouchableOpacity>
             </View>
 
-            {/* Custom Date Stepper Box (If custom date selected) */}
-            {(dateOption === 'custom' || showDatePicker) && (
-              <View style={styles.calendarBox}>
-                <View style={styles.calendarHeader}>
-                  <Ionicons name="calendar" size={16} color={Colors.primaryLight} />
-                  <Text style={styles.calendarTitle}>
-                    {formatDateIndonesian(customDate, { showDay: true })}
-                  </Text>
-                </View>
+            {/* Quick Day Shift Bar */}
+            <View style={styles.dayShiftBar}>
+              <TouchableOpacity
+                style={styles.dayShiftBtn}
+                onPress={() => {
+                  setDateOption('custom');
+                  adjustCustomDate('day', -1);
+                }}
+              >
+                <Ionicons name="chevron-back" size={16} color={Colors.textPrimary} />
+              </TouchableOpacity>
 
-                {/* Day, Month, Year stepper controls */}
-                <View style={styles.stepperRow}>
-                  {/* Day */}
-                  <View style={styles.stepperCol}>
-                    <Text style={styles.stepperLabel}>HARI</Text>
-                    <View style={styles.stepperCtrl}>
-                      <TouchableOpacity
-                        style={styles.stepBtn}
-                        onPress={() => adjustCustomDate('day', 1)}
-                      >
-                        <Ionicons name="chevron-up" size={16} color={Colors.textPrimary} />
-                      </TouchableOpacity>
-                      <Text style={styles.stepVal}>{customDate.split('-')[2]}</Text>
-                      <TouchableOpacity
-                        style={styles.stepBtn}
-                        onPress={() => adjustCustomDate('day', -1)}
-                      >
-                        <Ionicons name="chevron-down" size={16} color={Colors.textPrimary} />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-
-                  {/* Month */}
-                  <View style={styles.stepperCol}>
-                    <Text style={styles.stepperLabel}>BULAN</Text>
-                    <View style={styles.stepperCtrl}>
-                      <TouchableOpacity
-                        style={styles.stepBtn}
-                        onPress={() => adjustCustomDate('month', 1)}
-                      >
-                        <Ionicons name="chevron-up" size={16} color={Colors.textPrimary} />
-                      </TouchableOpacity>
-                      <Text style={styles.stepVal}>{customDate.split('-')[1]}</Text>
-                      <TouchableOpacity
-                        style={styles.stepBtn}
-                        onPress={() => adjustCustomDate('month', -1)}
-                      >
-                        <Ionicons name="chevron-down" size={16} color={Colors.textPrimary} />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-
-                  {/* Year */}
-                  <View style={styles.stepperCol}>
-                    <Text style={styles.stepperLabel}>TAHUN</Text>
-                    <View style={styles.stepperCtrl}>
-                      <TouchableOpacity
-                        style={styles.stepBtn}
-                        onPress={() => adjustCustomDate('year', 1)}
-                      >
-                        <Ionicons name="chevron-up" size={16} color={Colors.textPrimary} />
-                      </TouchableOpacity>
-                      <Text style={styles.stepVal}>{customDate.split('-')[0]}</Text>
-                      <TouchableOpacity
-                        style={styles.stepBtn}
-                        onPress={() => adjustCustomDate('year', -1)}
-                      >
-                        <Ionicons name="chevron-down" size={16} color={Colors.textPrimary} />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </View>
+              <View style={styles.dayDisplay}>
+                <Ionicons name="calendar-outline" size={14} color={Colors.primaryLight} />
+                <Text style={styles.dayDisplayText}>
+                  {formatDateIndonesian(customDate, { showDay: true })}
+                </Text>
               </View>
-            )}
+
+              <TouchableOpacity
+                style={styles.dayShiftBtn}
+                onPress={() => {
+                  setDateOption('custom');
+                  adjustCustomDate('day', 1);
+                }}
+              >
+                <Ionicons name="chevron-forward" size={16} color={Colors.textPrimary} />
+              </TouchableOpacity>
+            </View>
           </ScrollView>
 
           {/* Action Button */}
@@ -952,44 +892,34 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
     marginTop: Spacing.xs,
   },
-  calendarHeader: {
+  dayShiftBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.xs,
-    marginBottom: Spacing.sm,
+    justifyContent: 'space-between',
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.lg,
+    padding: Spacing.xs,
+    borderWidth: 1,
+    borderColor: Colors.surfaceBorder,
+    marginTop: Spacing.xs,
+    marginBottom: Spacing.md,
   },
-  calendarTitle: {
-    fontSize: Typography.sizes.xs,
-    fontWeight: Typography.weights.bold,
-    color: Colors.primaryLight,
-  },
-  stepperRow: {
-    flexDirection: 'row',
-    gap: Spacing.sm,
-  },
-  stepperCol: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  stepperLabel: {
-    fontSize: 9,
-    color: Colors.textTertiary,
-    fontWeight: Typography.weights.bold,
-    marginBottom: 4,
-  },
-  stepperCtrl: {
-    alignItems: 'center',
-    backgroundColor: Colors.surfaceLight,
+  dayShiftBtn: {
+    width: 34,
+    height: 34,
     borderRadius: Radius.md,
-    width: '100%',
-    paddingVertical: 2,
+    backgroundColor: Colors.surfaceLight,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  stepBtn: {
-    padding: 4,
+  dayDisplay: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
-  stepVal: {
-    fontSize: Typography.sizes.base,
-    fontWeight: Typography.weights.bold,
+  dayDisplayText: {
+    fontSize: Typography.sizes.xs,
+    fontWeight: Typography.weights.semibold,
     color: Colors.textPrimary,
   },
   saveBtn: {

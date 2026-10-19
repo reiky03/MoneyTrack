@@ -1,99 +1,112 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius } from '../constants/theme';
 import { useMoney } from '../context/MoneyContext';
-import { PeriodType, DateRange } from '../types';
-import { CustomDateRangeModal } from './CustomDateRangeModal';
+import { DateRange } from '../types';
+import { MonthPickerModal } from './MonthPickerModal';
+import { toDateString } from '../utils/dateUtils';
 
-interface PeriodOption {
-  type: PeriodType;
-  label: string;
-}
-
-const PERIOD_OPTIONS: PeriodOption[] = [
-  { type: 'this_month', label: 'Bulan Ini' },
-  { type: 'last_month', label: 'Bulan Lalu' },
-  { type: 'this_week', label: 'Minggu Ini' },
-  { type: 'today', label: 'Hari Ini' },
-  { type: 'this_year', label: 'Tahun Ini' },
+const MONTH_NAMES_FULL = [
+  'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
 ];
 
 export const PeriodFilterBar: React.FC = () => {
   const { periodState, setPeriod } = useMoney();
-  const [showCustomModal, setShowCustomModal] = useState(false);
+  const [showMonthPicker, setShowMonthPicker] = useState(false);
 
-  const handleCustomApply = (range: DateRange) => {
-    setPeriod('custom', range);
+  // Parse current active start date
+  const startDate = new Date(periodState.range.startDate);
+  const currentMonthIdx = startDate.getMonth();
+  const currentYear = startDate.getFullYear();
+
+  // Jump to previous month
+  const handlePrevMonth = () => {
+    const prev = new Date(currentYear, currentMonthIdx - 1, 1);
+    const start = new Date(prev.getFullYear(), prev.getMonth(), 1);
+    const end = new Date(prev.getFullYear(), prev.getMonth() + 1, 0);
+
+    setPeriod('custom', {
+      startDate: toDateString(start),
+      endDate: toDateString(end),
+    });
   };
+
+  // Jump to next month
+  const handleNextMonth = () => {
+    const next = new Date(currentYear, currentMonthIdx + 1, 1);
+    const start = new Date(next.getFullYear(), next.getMonth(), 1);
+    const end = new Date(next.getFullYear(), next.getMonth() + 1, 0);
+
+    setPeriod('custom', {
+      startDate: toDateString(start),
+      endDate: toDateString(end),
+    });
+  };
+
+  // Label display: e.g. "Oktober 2026"
+  const displayTitle = `${MONTH_NAMES_FULL[currentMonthIdx]} ${currentYear}`;
+
+  const now = new Date();
+  const isThisMonth =
+    now.getFullYear() === currentYear && now.getMonth() === currentMonthIdx;
 
   return (
     <View style={styles.container}>
-      {/* Scrollable Horizontal Period Pills */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {PERIOD_OPTIONS.map((option) => {
-          const isActive = periodState.type === option.type;
-          return (
-            <TouchableOpacity
-              key={option.type}
-              style={[styles.pill, isActive && styles.pillActive]}
-              onPress={() => setPeriod(option.type)}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.pillText, isActive && styles.pillTextActive]}>
-                {option.label}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-
-        {/* Custom Range Pill */}
+      <View style={styles.navigatorCard}>
+        {/* Previous Month Arrow */}
         <TouchableOpacity
-          style={[styles.pill, periodState.type === 'custom' && styles.pillActive]}
-          onPress={() => setShowCustomModal(true)}
+          style={styles.arrowButton}
+          onPress={handlePrevMonth}
+          activeOpacity={0.7}
+          accessibilityLabel="Bulan Sebelumnya"
+        >
+          <Ionicons name="chevron-back" size={18} color={Colors.textPrimary} />
+        </TouchableOpacity>
+
+        {/* Center Title & Dropdown Trigger */}
+        <TouchableOpacity
+          style={styles.centerButton}
+          onPress={() => setShowMonthPicker(true)}
           activeOpacity={0.7}
         >
-          <Ionicons
-            name="calendar-outline"
-            size={13}
-            color={periodState.type === 'custom' ? '#FFFFFF' : Colors.textSecondary}
-            style={{ marginRight: 4 }}
-          />
-          <Text
-            style={[
-              styles.pillText,
-              periodState.type === 'custom' && styles.pillTextActive,
-            ]}
-          >
-            {periodState.type === 'custom' ? 'Kustom' : 'Pilih Tanggal'}
-          </Text>
+          <View style={styles.calendarIconCircle}>
+            <Ionicons name="calendar" size={14} color={Colors.primaryLight} />
+          </View>
+          <Text style={styles.monthTitle}>{displayTitle}</Text>
+          <Ionicons name="chevron-down" size={14} color={Colors.textTertiary} />
         </TouchableOpacity>
-      </ScrollView>
 
-      {/* Active Range Indicator Pill */}
-      <View style={styles.activeRangeContainer}>
-        <View style={styles.activeRangeBadge}>
-          <Ionicons name="time-outline" size={12} color={Colors.textTertiary} />
-          <Text style={styles.activeRangeText}>{periodState.label}</Text>
-        </View>
+        {/* Next Month Arrow */}
+        <TouchableOpacity
+          style={styles.arrowButton}
+          onPress={handleNextMonth}
+          activeOpacity={0.7}
+          accessibilityLabel="Bulan Berikutnya"
+        >
+          <Ionicons name="chevron-forward" size={18} color={Colors.textPrimary} />
+        </TouchableOpacity>
       </View>
 
-      {/* Custom Date Modal */}
-      <CustomDateRangeModal
-        visible={showCustomModal}
-        currentRange={periodState.range}
-        onClose={() => setShowCustomModal(false)}
-        onApply={handleCustomApply}
+      {/* Quick "Kembali ke Bulan Ini" shortcut if user navigated away */}
+      {!isThisMonth && (
+        <TouchableOpacity
+          style={styles.returnTodayBadge}
+          onPress={() => setPeriod('this_month')}
+        >
+          <Ionicons name="refresh" size={11} color={Colors.primaryLight} />
+          <Text style={styles.returnTodayText}>Kembali ke Bulan Ini</Text>
+        </TouchableOpacity>
+      )}
+
+      {/* Month & Year Picker Modal */}
+      <MonthPickerModal
+        visible={showMonthPicker}
+        activeStartDate={periodState.range.startDate}
+        onClose={() => setShowMonthPicker(false)}
+        onSelectMonth={(range) => setPeriod('custom', range)}
+        onSelectPreset={(preset) => setPeriod(preset)}
       />
     </View>
   );
@@ -102,53 +115,63 @@ export const PeriodFilterBar: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     marginVertical: Spacing.xs,
-  },
-  scrollContent: {
     paddingHorizontal: Spacing.xl,
-    gap: Spacing.xs,
-    paddingVertical: Spacing.xs,
+    alignItems: 'center',
   },
-  pill: {
+  navigatorCard: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     backgroundColor: Colors.surface,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: 7,
     borderRadius: Radius.full,
+    paddingVertical: 5,
+    paddingHorizontal: 6,
     borderWidth: 1,
     borderColor: Colors.surfaceBorder,
+    width: '100%',
+    maxWidth: 380,
   },
-  pillActive: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.35,
-    shadowRadius: 4,
-    elevation: 3,
+  arrowButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.surfaceLight,
   },
-  pillText: {
-    fontSize: Typography.sizes.xs,
-    color: Colors.textSecondary,
-    fontWeight: Typography.weights.medium,
-  },
-  pillTextActive: {
-    color: '#FFFFFF',
-    fontWeight: Typography.weights.bold,
-  },
-  activeRangeContainer: {
-    paddingHorizontal: Spacing.xl,
-    marginTop: 4,
+  centerButton: {
     flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    paddingVertical: 4,
+    paddingHorizontal: Spacing.md,
   },
-  activeRangeBadge: {
+  calendarIconCircle: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: 'rgba(99, 102, 241, 0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  monthTitle: {
+    fontSize: Typography.sizes.sm,
+    fontWeight: Typography.weights.bold,
+    color: Colors.textPrimary,
+  },
+  returnTodayBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
+    marginTop: 6,
+    backgroundColor: 'rgba(99, 102, 241, 0.12)',
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 3,
+    borderRadius: Radius.full,
   },
-  activeRangeText: {
-    fontSize: Typography.sizes.xs,
-    color: Colors.textTertiary,
-    fontWeight: Typography.weights.medium,
+  returnTodayText: {
+    fontSize: 10,
+    fontWeight: Typography.weights.semibold,
+    color: Colors.primaryLight,
   },
 });
