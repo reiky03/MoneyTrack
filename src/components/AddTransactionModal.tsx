@@ -12,14 +12,14 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius } from '../constants/theme';
 import { useMoney } from '../context/MoneyContext';
-import { TransactionType, Category, Wallet } from '../types';
+import { TransactionType, Category } from '../types';
 import {
   formatNumberWithDots,
   parseCurrencyInput,
   formatRupiah,
 } from '../utils/formatters';
 import { AddCategoryModal } from './AddCategoryModal';
-import { toDateString } from '../utils/dateUtils';
+import { formatDateIndonesian, toDateString } from '../utils/dateUtils';
 
 interface AddTransactionModalProps {
   visible: boolean;
@@ -53,7 +53,12 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
   const [targetWalletId, setTargetWalletId] = useState<string>('');
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
   const [note, setNote] = useState<string>('');
-  const [dateOption, setDateOption] = useState<'today' | 'yesterday'>('today');
+  
+  // Date states
+  const [dateOption, setDateOption] = useState<'today' | 'yesterday' | 'custom'>('today');
+  const [customDate, setCustomDate] = useState<string>(toDateString(new Date()));
+  const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
+
   const [showAddCategoryModal, setShowAddCategoryModal] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -64,6 +69,8 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
       setAmountText('');
       setNote('');
       setDateOption('today');
+      setCustomDate(toDateString(new Date()));
+      setShowDatePicker(false);
 
       // Default wallet
       if (wallets.length > 0) {
@@ -83,7 +90,7 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
     }
   }, [visible, initialType, wallets, categories]);
 
-  // When type changes, adjust available categories
+  // Adjust available categories when type changes
   const handleTypeChange = (newType: TransactionType) => {
     setType(newType);
     if (newType !== 'transfer') {
@@ -105,6 +112,17 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
 
   const handleCategoryCreated = (newCat: Category) => {
     setSelectedCategoryId(newCat.id);
+  };
+
+  const adjustCustomDate = (unit: 'year' | 'month' | 'day', amount: number) => {
+    const parts = customDate.split('-').map(Number);
+    const d = new Date(parts[0], parts[1] - 1, parts[2]);
+
+    if (unit === 'year') d.setFullYear(d.getFullYear() + amount);
+    if (unit === 'month') d.setMonth(d.getMonth() + amount);
+    if (unit === 'day') d.setDate(d.getDate() + amount);
+
+    setCustomDate(toDateString(d));
   };
 
   const handleSave = async () => {
@@ -130,10 +148,16 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
       return;
     }
 
-    // Determine date
-    const txDate = new Date();
+    // Determine final ISO date
+    let finalDateIso = new Date().toISOString();
     if (dateOption === 'yesterday') {
-      txDate.setDate(txDate.getDate() - 1);
+      const y = new Date();
+      y.setDate(y.getDate() - 1);
+      finalDateIso = y.toISOString();
+    } else if (dateOption === 'custom') {
+      const parts = customDate.split('-').map(Number);
+      const c = new Date(parts[0], parts[1] - 1, parts[2], 12, 0, 0);
+      finalDateIso = c.toISOString();
     }
 
     try {
@@ -144,12 +168,12 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
         walletId: selectedWalletId,
         toWalletId: type === 'transfer' ? targetWalletId : undefined,
         categoryId: type !== 'transfer' ? selectedCategoryId : undefined,
-        date: txDate.toISOString(),
+        date: finalDateIso,
         note: note.trim() || undefined,
       });
 
       onClose();
-    } catch (err) {
+    } catch {
       Alert.alert('Gagal', 'Terjadi kesalahan saat menyimpan transaksi.');
     } finally {
       setIsSubmitting(false);
@@ -480,7 +504,7 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
               />
             </View>
 
-            {/* Date Selection */}
+            {/* Date Selection with Calendar support */}
             <Text style={styles.inputLabel}>WAKTU TRANSAKSI</Text>
             <View style={styles.dateRow}>
               <TouchableOpacity
@@ -488,7 +512,10 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
                   styles.dateChip,
                   dateOption === 'today' && styles.dateChipActive,
                 ]}
-                onPress={() => setDateOption('today')}
+                onPress={() => {
+                  setDateOption('today');
+                  setShowDatePicker(false);
+                }}
               >
                 <Ionicons
                   name="today-outline"
@@ -510,10 +537,13 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
                   styles.dateChip,
                   dateOption === 'yesterday' && styles.dateChipActive,
                 ]}
-                onPress={() => setDateOption('yesterday')}
+                onPress={() => {
+                  setDateOption('yesterday');
+                  setShowDatePicker(false);
+                }}
               >
                 <Ionicons
-                  name="calendar-outline"
+                  name="time-outline"
                   size={14}
                   color={dateOption === 'yesterday' ? '#FFFFFF' : Colors.textSecondary}
                 />
@@ -526,7 +556,108 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
                   Kemarin
                 </Text>
               </TouchableOpacity>
+
+              {/* Custom Calendar Date Chip */}
+              <TouchableOpacity
+                style={[
+                  styles.dateChip,
+                  dateOption === 'custom' && styles.dateChipActive,
+                ]}
+                onPress={() => {
+                  setDateOption('custom');
+                  setShowDatePicker((prev) => !prev);
+                }}
+              >
+                <Ionicons
+                  name="calendar-outline"
+                  size={14}
+                  color={dateOption === 'custom' ? '#FFFFFF' : Colors.textSecondary}
+                />
+                <Text
+                  style={[
+                    styles.dateChipText,
+                    dateOption === 'custom' && styles.dateChipTextActive,
+                  ]}
+                >
+                  {dateOption === 'custom' ? customDate : 'Pilih Tanggal...'}
+                </Text>
+              </TouchableOpacity>
             </View>
+
+            {/* Custom Date Stepper Box (If custom date selected) */}
+            {(dateOption === 'custom' || showDatePicker) && (
+              <View style={styles.calendarBox}>
+                <View style={styles.calendarHeader}>
+                  <Ionicons name="calendar" size={16} color={Colors.primaryLight} />
+                  <Text style={styles.calendarTitle}>
+                    {formatDateIndonesian(customDate, { showDay: true })}
+                  </Text>
+                </View>
+
+                {/* Day, Month, Year stepper controls */}
+                <View style={styles.stepperRow}>
+                  {/* Day */}
+                  <View style={styles.stepperCol}>
+                    <Text style={styles.stepperLabel}>HARI</Text>
+                    <View style={styles.stepperCtrl}>
+                      <TouchableOpacity
+                        style={styles.stepBtn}
+                        onPress={() => adjustCustomDate('day', 1)}
+                      >
+                        <Ionicons name="chevron-up" size={16} color={Colors.textPrimary} />
+                      </TouchableOpacity>
+                      <Text style={styles.stepVal}>{customDate.split('-')[2]}</Text>
+                      <TouchableOpacity
+                        style={styles.stepBtn}
+                        onPress={() => adjustCustomDate('day', -1)}
+                      >
+                        <Ionicons name="chevron-down" size={16} color={Colors.textPrimary} />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+
+                  {/* Month */}
+                  <View style={styles.stepperCol}>
+                    <Text style={styles.stepperLabel}>BULAN</Text>
+                    <View style={styles.stepperCtrl}>
+                      <TouchableOpacity
+                        style={styles.stepBtn}
+                        onPress={() => adjustCustomDate('month', 1)}
+                      >
+                        <Ionicons name="chevron-up" size={16} color={Colors.textPrimary} />
+                      </TouchableOpacity>
+                      <Text style={styles.stepVal}>{customDate.split('-')[1]}</Text>
+                      <TouchableOpacity
+                        style={styles.stepBtn}
+                        onPress={() => adjustCustomDate('month', -1)}
+                      >
+                        <Ionicons name="chevron-down" size={16} color={Colors.textPrimary} />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+
+                  {/* Year */}
+                  <View style={styles.stepperCol}>
+                    <Text style={styles.stepperLabel}>TAHUN</Text>
+                    <View style={styles.stepperCtrl}>
+                      <TouchableOpacity
+                        style={styles.stepBtn}
+                        onPress={() => adjustCustomDate('year', 1)}
+                      >
+                        <Ionicons name="chevron-up" size={16} color={Colors.textPrimary} />
+                      </TouchableOpacity>
+                      <Text style={styles.stepVal}>{customDate.split('-')[0]}</Text>
+                      <TouchableOpacity
+                        style={styles.stepBtn}
+                        onPress={() => adjustCustomDate('year', -1)}
+                      >
+                        <Ionicons name="chevron-down" size={16} color={Colors.textPrimary} />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            )}
           </ScrollView>
 
           {/* Action Button */}
@@ -565,15 +696,18 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.75)',
     justifyContent: 'flex-end',
+    alignItems: 'center',
   },
   container: {
     backgroundColor: Colors.backgroundElevated,
     borderTopLeftRadius: Radius.xl,
     borderTopRightRadius: Radius.xl,
-    padding: Spacing.xl,
+    padding: Spacing.lg,
     maxHeight: '92%',
     borderWidth: 1,
     borderColor: Colors.surfaceBorder,
+    width: '100%',
+    maxWidth: 480,
   },
   header: {
     flexDirection: 'row',
@@ -781,8 +915,9 @@ const styles = StyleSheet.create({
   },
   dateRow: {
     flexDirection: 'row',
-    gap: Spacing.sm,
-    marginBottom: Spacing.md,
+    gap: Spacing.xs,
+    marginBottom: Spacing.xs,
+    flexWrap: 'wrap',
   },
   dateChip: {
     flexDirection: 'row',
@@ -807,6 +942,55 @@ const styles = StyleSheet.create({
   dateChipTextActive: {
     color: '#FFFFFF',
     fontWeight: Typography.weights.bold,
+  },
+  calendarBox: {
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.lg,
+    padding: Spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(99, 102, 241, 0.3)',
+    marginBottom: Spacing.md,
+    marginTop: Spacing.xs,
+  },
+  calendarHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    marginBottom: Spacing.sm,
+  },
+  calendarTitle: {
+    fontSize: Typography.sizes.xs,
+    fontWeight: Typography.weights.bold,
+    color: Colors.primaryLight,
+  },
+  stepperRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  stepperCol: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  stepperLabel: {
+    fontSize: 9,
+    color: Colors.textTertiary,
+    fontWeight: Typography.weights.bold,
+    marginBottom: 4,
+  },
+  stepperCtrl: {
+    alignItems: 'center',
+    backgroundColor: Colors.surfaceLight,
+    borderRadius: Radius.md,
+    width: '100%',
+    paddingVertical: 2,
+  },
+  stepBtn: {
+    padding: 4,
+  },
+  stepVal: {
+    fontSize: Typography.sizes.base,
+    fontWeight: Typography.weights.bold,
+    color: Colors.textPrimary,
   },
   saveBtn: {
     backgroundColor: Colors.primary,
