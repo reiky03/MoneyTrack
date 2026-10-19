@@ -6,23 +6,29 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
+  Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius } from '../constants/theme';
 import { useMoney } from '../context/MoneyContext';
 import { TransactionItem } from '../components/TransactionItem';
 import { TransactionType } from '../types';
+import { formatRupiah } from '../utils/formatters';
 
 interface TransactionsScreenProps {
   onAddPress: () => void;
 }
 
 export const TransactionsScreen: React.FC<TransactionsScreenProps> = ({ onAddPress }) => {
-  const { filteredTransactions, categories, wallets } = useMoney();
+  const { filteredTransactions, categories, wallets, isPrivacyMode } = useMoney();
 
   const [filterType, setFilterType] = useState<TransactionType | 'all'>('all');
   const [filterWalletId, setFilterWalletId] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [showWalletModal, setShowWalletModal] = useState<boolean>(false);
+
+  // Selected wallet object
+  const selectedWallet = wallets.find((w) => w.id === filterWalletId);
 
   // Filtering
   const displayed = filteredTransactions.filter((tx) => {
@@ -88,7 +94,7 @@ export const TransactionsScreen: React.FC<TransactionsScreenProps> = ({ onAddPre
         )}
       </View>
 
-      {/* Row 1: Segmented Type Filter (Semua | Pengeluaran | Pemasukan | Transfer) */}
+      {/* Row 1: Segmented Type Filter (Hanya Semua, Keluar, Masuk) */}
       <View style={styles.typeSegmentWrapper}>
         <View style={styles.typeSegmentContainer}>
           <TouchableOpacity
@@ -144,80 +150,49 @@ export const TransactionsScreen: React.FC<TransactionsScreenProps> = ({ onAddPre
               Masuk
             </Text>
           </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.segmentBtn,
-              filterType === 'transfer' && styles.segmentBtnActiveTransfer,
-            ]}
-            onPress={() => setFilterType('transfer')}
-            activeOpacity={0.7}
-          >
-            <Text
-              style={[
-                styles.segmentText,
-                filterType === 'transfer' && styles.segmentTextActive,
-              ]}
-            >
-              Transfer
-            </Text>
-          </TouchableOpacity>
         </View>
       </View>
 
-      {/* Row 2: Source Wallet Filter (Scrollable with explicit container height to prevent any overlap) */}
-      <View style={styles.walletFilterSection}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.walletFilterContent}
-          style={styles.walletFilterScroll}
+      {/* Row 2: Single Simple Filter Dropdown Pill */}
+      <View style={styles.filterBarRow}>
+        <TouchableOpacity
+          style={[
+            styles.filterDropdownBtn,
+            filterWalletId !== 'all' && styles.filterDropdownBtnActive,
+          ]}
+          onPress={() => setShowWalletModal(true)}
+          activeOpacity={0.75}
         >
-          <TouchableOpacity
+          <Ionicons
+            name="funnel-outline"
+            size={13}
+            color={filterWalletId !== 'all' ? Colors.primaryLight : Colors.textSecondary}
+          />
+          <Text
             style={[
-              styles.walletChip,
-              filterWalletId === 'all' && styles.walletChipActive,
+              styles.filterDropdownText,
+              filterWalletId !== 'all' && styles.filterDropdownTextActive,
             ]}
+          >
+            {selectedWallet ? selectedWallet.name : 'Filter Dompet: Semua'}
+          </Text>
+          <Ionicons
+            name="chevron-down"
+            size={13}
+            color={filterWalletId !== 'all' ? Colors.primaryLight : Colors.textTertiary}
+          />
+        </TouchableOpacity>
+
+        {filterWalletId !== 'all' && (
+          <TouchableOpacity
+            style={styles.resetFilterBtn}
             onPress={() => setFilterWalletId('all')}
             activeOpacity={0.7}
           >
-            <Text
-              style={[
-                styles.walletChipText,
-                filterWalletId === 'all' && styles.walletChipTextActive,
-              ]}
-            >
-              Semua Dompet
-            </Text>
+            <Text style={styles.resetFilterText}>Reset</Text>
+            <Ionicons name="close" size={13} color={Colors.textTertiary} />
           </TouchableOpacity>
-
-          {wallets.map((w) => (
-            <TouchableOpacity
-              key={w.id}
-              style={[
-                styles.walletChip,
-                filterWalletId === w.id && styles.walletChipActive,
-              ]}
-              onPress={() => setFilterWalletId(w.id)}
-              activeOpacity={0.7}
-            >
-              <Ionicons
-                name={(w.icon as any) || 'wallet'}
-                size={12}
-                color={filterWalletId === w.id ? '#FFFFFF' : w.color}
-                style={{ marginRight: 5 }}
-              />
-              <Text
-                style={[
-                  styles.walletChipText,
-                  filterWalletId === w.id && styles.walletChipTextActive,
-                ]}
-              >
-                {w.name}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+        )}
       </View>
 
       {/* Main Transaction List */}
@@ -242,6 +217,100 @@ export const TransactionsScreen: React.FC<TransactionsScreenProps> = ({ onAddPre
         {/* Space for bottom navbar */}
         <View style={{ height: 110 }} />
       </ScrollView>
+
+      {/* Modal Filter Dompet */}
+      <Modal
+        visible={showWalletModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowWalletModal(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowWalletModal(false)}
+        >
+          <View style={styles.modalCard}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Filter Sumber Dompet</Text>
+              <TouchableOpacity onPress={() => setShowWalletModal(false)}>
+                <Ionicons name="close" size={18} color={Colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity
+              style={[
+                styles.modalOption,
+                filterWalletId === 'all' && styles.modalOptionActive,
+              ]}
+              onPress={() => {
+                setFilterWalletId('all');
+                setShowWalletModal(false);
+              }}
+            >
+              <View style={styles.modalOptionLeft}>
+                <Ionicons
+                  name="layers-outline"
+                  size={18}
+                  color={filterWalletId === 'all' ? Colors.primaryLight : Colors.textSecondary}
+                />
+                <Text
+                  style={[
+                    styles.modalOptionText,
+                    filterWalletId === 'all' && styles.modalOptionTextActive,
+                  ]}
+                >
+                  Semua Dompet
+                </Text>
+              </View>
+              {filterWalletId === 'all' && (
+                <Ionicons name="checkmark" size={16} color={Colors.primaryLight} />
+              )}
+            </TouchableOpacity>
+
+            {wallets.map((w) => {
+              const isSelected = filterWalletId === w.id;
+              return (
+                <TouchableOpacity
+                  key={w.id}
+                  style={[
+                    styles.modalOption,
+                    isSelected && styles.modalOptionActive,
+                  ]}
+                  onPress={() => {
+                    setFilterWalletId(w.id);
+                    setShowWalletModal(false);
+                  }}
+                >
+                  <View style={styles.modalOptionLeft}>
+                    <Ionicons
+                      name={(w.icon as any) || 'wallet'}
+                      size={18}
+                      color={w.color}
+                    />
+                    <View>
+                      <Text
+                        style={[
+                          styles.modalOptionText,
+                          isSelected && styles.modalOptionTextActive,
+                        ]}
+                      >
+                        {w.name}
+                      </Text>
+                      <Text style={styles.modalOptionSub}>
+                        Saldo: {formatRupiah(w.balance, isPrivacyMode)}
+                      </Text>
+                    </View>
+                  </View>
+                  {isSelected && (
+                    <Ionicons name="checkmark" size={16} color={Colors.primaryLight} />
+                  )}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 };
@@ -303,7 +372,7 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
   },
 
-  // Segmented Type Filter
+  // Segmented Type Filter (Semua, Keluar, Masuk)
   typeSegmentWrapper: {
     paddingHorizontal: Spacing.xl,
     marginBottom: Spacing.xs,
@@ -332,9 +401,6 @@ const styles = StyleSheet.create({
   segmentBtnActiveIncome: {
     backgroundColor: Colors.income,
   },
-  segmentBtnActiveTransfer: {
-    backgroundColor: Colors.transfer,
-  },
   segmentText: {
     fontSize: Typography.sizes.xs,
     color: Colors.textSecondary,
@@ -345,42 +411,120 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weights.bold,
   },
 
-  // Wallet Filter Section
-  walletFilterSection: {
+  // Single Filter Dropdown Bar
+  filterBarRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: Spacing.xl,
+    gap: Spacing.xs,
     marginBottom: Spacing.sm,
     marginTop: 2,
   },
-  walletFilterScroll: {
-    flexGrow: 0,
-  },
-  walletFilterContent: {
-    paddingHorizontal: Spacing.xl,
-    gap: Spacing.xs,
-    alignItems: 'center',
-    paddingVertical: 2,
-  },
-  walletChip: {
+  filterDropdownBtn: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 6,
     backgroundColor: Colors.surface,
     paddingHorizontal: Spacing.md,
-    paddingVertical: 6,
+    paddingVertical: 7,
     borderRadius: Radius.full,
     borderWidth: 1,
     borderColor: Colors.surfaceBorder,
   },
-  walletChipActive: {
-    backgroundColor: 'rgba(99, 102, 241, 0.2)',
+  filterDropdownBtnActive: {
     borderColor: Colors.primary,
+    backgroundColor: 'rgba(99, 102, 241, 0.12)',
   },
-  walletChipText: {
+  filterDropdownText: {
     fontSize: 11,
     color: Colors.textSecondary,
     fontWeight: Typography.weights.medium,
   },
-  walletChipTextActive: {
-    color: Colors.textPrimary,
+  filterDropdownTextActive: {
+    color: Colors.primaryLight,
     fontWeight: Typography.weights.bold,
+  },
+  resetFilterBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 6,
+    borderRadius: Radius.full,
+  },
+  resetFilterText: {
+    fontSize: 10,
+    color: Colors.textTertiary,
+  },
+
+  // Modal styling
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: Spacing.xl,
+  },
+  modalCard: {
+    backgroundColor: Colors.backgroundElevated,
+    borderRadius: Radius.xl,
+    padding: Spacing.lg,
+    width: '100%',
+    maxWidth: 340,
+    borderWidth: 1,
+    borderColor: Colors.surfaceBorder,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.5,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: Spacing.md,
+  },
+  modalTitle: {
+    fontSize: Typography.sizes.base,
+    fontWeight: Typography.weights.bold,
+    color: Colors.textPrimary,
+  },
+  modalOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    paddingHorizontal: Spacing.md,
+    borderRadius: Radius.lg,
+    marginBottom: 4,
+    backgroundColor: Colors.surface,
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  modalOptionActive: {
+    borderColor: Colors.primary,
+    backgroundColor: 'rgba(99, 102, 241, 0.12)',
+  },
+  modalOptionLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  modalOptionText: {
+    fontSize: Typography.sizes.sm,
+    color: Colors.textPrimary,
+    fontWeight: Typography.weights.medium,
+  },
+  modalOptionTextActive: {
+    color: Colors.primaryLight,
+    fontWeight: Typography.weights.bold,
+  },
+  modalOptionSub: {
+    fontSize: 10,
+    color: Colors.textTertiary,
+    marginTop: 1,
   },
 
   listContent: {
