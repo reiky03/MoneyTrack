@@ -14,6 +14,7 @@ import { Header } from '../components/Header';
 import { TotalBalanceCard } from '../components/TotalBalanceCard';
 import { WalletSlider } from '../components/WalletSlider';
 import { PeriodFilterBar } from '../components/PeriodFilterBar';
+import { PieChart } from '../components/PieChart';
 import { TransactionItem } from '../components/TransactionItem';
 import { AddTransactionModal } from '../components/AddTransactionModal';
 import { AddWalletModal } from '../components/AddWalletModal';
@@ -30,19 +31,16 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
   onNavigateToAnalytics,
   onAddTransactionPress,
 }) => {
-  const { filteredTransactions, isLoading } = useMoney();
+  const {
+    filteredTransactions,
+    expenseCategorySummaries,
+    isPrivacyMode,
+    isLoading,
+  } = useMoney();
 
   const [showAddTxModal, setShowAddTxModal] = useState(false);
   const [showAddWalletModal, setShowAddWalletModal] = useState(false);
   const [showManageWalletsModal, setShowManageWalletsModal] = useState(false);
-
-  const handleOpenAddTx = () => {
-    if (onAddTransactionPress) {
-      onAddTransactionPress();
-    } else {
-      setShowAddTxModal(true);
-    }
-  };
 
   if (isLoading) {
     return (
@@ -53,7 +51,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
     );
   }
 
-  // Show only recent 5 transactions on the home dashboard to keep it clean and uncluttered
+  // Show recent 5 transactions on the home dashboard
   const recentTransactions = filteredTransactions.slice(0, 5);
 
   return (
@@ -76,30 +74,32 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
           onWalletManagePress={() => setShowManageWalletsModal(true)}
         />
 
-        {/* Period Filter Bar */}
+        {/* Period Month Navigator Bar */}
         <PeriodFilterBar />
 
-        {/* Quick Analytics Banner / CTA to view Deep Analytics */}
-        {onNavigateToAnalytics && (
-          <TouchableOpacity
-            style={styles.analyticsBanner}
-            onPress={onNavigateToAnalytics}
-            activeOpacity={0.8}
-          >
-            <View style={styles.bannerLeft}>
-              <View style={styles.bannerIconCircle}>
-                <Ionicons name="pie-chart" size={18} color={Colors.primaryLight} />
-              </View>
-              <View>
-                <Text style={styles.bannerTitle}>Lihat Grafik & Analisis Kategori</Text>
-                <Text style={styles.bannerSubtitle}>
-                  Donut chart, tren arus kas, dan pengeluaran terboros
-                </Text>
-              </View>
+        {/* Category Distribution Pie Chart right on Home Screen */}
+        <View style={styles.pieCard}>
+          <View style={styles.pieCardHeader}>
+            <View>
+              <Text style={styles.pieCardTitle}>Distribusi Pengeluaran</Text>
+              <Text style={styles.pieCardSub}>Rincian belanja per kategori</Text>
             </View>
-            <Ionicons name="chevron-forward" size={18} color={Colors.textTertiary} />
-          </TouchableOpacity>
-        )}
+            {onNavigateToAnalytics && (
+              <TouchableOpacity
+                onPress={onNavigateToAnalytics}
+                style={styles.seeMoreBtn}
+              >
+                <Text style={styles.seeMoreText}>Lihat Analisis</Text>
+                <Ionicons name="chevron-forward" size={13} color={Colors.primaryLight} />
+              </TouchableOpacity>
+            )}
+          </View>
+
+          <PieChart
+            data={expenseCategorySummaries}
+            isPrivacyMode={isPrivacyMode}
+          />
+        </View>
 
         {/* Recent Transactions Section */}
         <View style={styles.recentSection}>
@@ -175,41 +175,44 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: Spacing.xxl,
   },
-  analyticsBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+  pieCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.xl,
+    padding: Spacing.lg,
     marginHorizontal: Spacing.xl,
-    padding: Spacing.md,
-    borderRadius: Radius.lg,
-    borderWidth: 1,
-    borderColor: 'rgba(99, 102, 241, 0.25)',
     marginVertical: Spacing.sm,
+    borderWidth: 1,
+    borderColor: Colors.surfaceBorder,
   },
-  bannerLeft: {
+  pieCardHeader: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    gap: Spacing.sm,
-    flex: 1,
+    marginBottom: Spacing.xs,
   },
-  bannerIconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(99, 102, 241, 0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  bannerTitle: {
-    fontSize: Typography.sizes.xs,
+  pieCardTitle: {
+    fontSize: Typography.sizes.base,
     fontWeight: Typography.weights.bold,
     color: Colors.textPrimary,
   },
-  bannerSubtitle: {
+  pieCardSub: {
     fontSize: 10,
-    color: Colors.textSecondary,
+    color: Colors.textTertiary,
     marginTop: 1,
+  },
+  seeMoreBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 4,
+    borderRadius: Radius.full,
+  },
+  seeMoreText: {
+    fontSize: Typography.sizes.xs,
+    color: Colors.primaryLight,
+    fontWeight: Typography.weights.semibold,
   },
   recentSection: {
     paddingHorizontal: Spacing.xl,

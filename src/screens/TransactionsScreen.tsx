@@ -12,14 +12,13 @@ import { Colors, Typography, Spacing, Radius } from '../constants/theme';
 import { useMoney } from '../context/MoneyContext';
 import { TransactionItem } from '../components/TransactionItem';
 import { TransactionType } from '../types';
-import { formatRupiah } from '../utils/formatters';
 
 interface TransactionsScreenProps {
   onAddPress: () => void;
 }
 
 export const TransactionsScreen: React.FC<TransactionsScreenProps> = ({ onAddPress }) => {
-  const { filteredTransactions, categories, wallets, isPrivacyMode } = useMoney();
+  const { filteredTransactions, categories, wallets } = useMoney();
 
   const [filterType, setFilterType] = useState<TransactionType | 'all'>('all');
   const [filterWalletId, setFilterWalletId] = useState<string>('all');
@@ -51,13 +50,6 @@ export const TransactionsScreen: React.FC<TransactionsScreenProps> = ({ onAddPre
     return true;
   });
 
-  // Calculate sum for current filtered view
-  const totalAmount = displayed.reduce((sum, tx) => {
-    if (tx.type === 'expense') return sum + tx.amount;
-    if (tx.type === 'income') return sum + tx.amount;
-    return sum;
-  }, 0);
-
   return (
     <View style={styles.container}>
       {/* Top Header */}
@@ -79,7 +71,7 @@ export const TransactionsScreen: React.FC<TransactionsScreenProps> = ({ onAddPre
         </TouchableOpacity>
       </View>
 
-      {/* Search Input */}
+      {/* Search Input Bar */}
       <View style={styles.searchBar}>
         <Ionicons name="search" size={16} color={Colors.textTertiary} />
         <TextInput
@@ -96,129 +88,139 @@ export const TransactionsScreen: React.FC<TransactionsScreenProps> = ({ onAddPre
         )}
       </View>
 
-      {/* Filter Tabs (Semua, Pengeluaran, Pemasukan, Transfer) */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.filterRow}
-      >
-        <TouchableOpacity
-          style={[styles.filterChip, filterType === 'all' && styles.filterChipActive]}
-          onPress={() => setFilterType('all')}
-        >
-          <Text
-            style={[
-              styles.filterChipText,
-              filterType === 'all' && styles.filterChipTextActive,
-            ]}
-          >
-            Semua
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.filterChip,
-            filterType === 'expense' && styles.filterChipActiveExpense,
-          ]}
-          onPress={() => setFilterType('expense')}
-        >
-          <Text
-            style={[
-              styles.filterChipText,
-              filterType === 'expense' && styles.filterChipTextActive,
-            ]}
-          >
-            Pengeluaran
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.filterChip,
-            filterType === 'income' && styles.filterChipActiveIncome,
-          ]}
-          onPress={() => setFilterType('income')}
-        >
-          <Text
-            style={[
-              styles.filterChipText,
-              filterType === 'income' && styles.filterChipTextActive,
-            ]}
-          >
-            Pemasukan
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.filterChip,
-            filterType === 'transfer' && styles.filterChipActiveTransfer,
-          ]}
-          onPress={() => setFilterType('transfer')}
-        >
-          <Text
-            style={[
-              styles.filterChipText,
-              filterType === 'transfer' && styles.filterChipTextActive,
-            ]}
-          >
-            Transfer
-          </Text>
-        </TouchableOpacity>
-      </ScrollView>
-
-      {/* Wallet Filter Row */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.walletFilterRow}
-      >
-        <TouchableOpacity
-          style={[
-            styles.walletChip,
-            filterWalletId === 'all' && styles.walletChipActive,
-          ]}
-          onPress={() => setFilterWalletId('all')}
-        >
-          <Text
-            style={[
-              styles.walletChipText,
-              filterWalletId === 'all' && styles.walletChipTextActive,
-            ]}
-          >
-            Semua Dompet
-          </Text>
-        </TouchableOpacity>
-
-        {wallets.map((w) => (
+      {/* Row 1: Segmented Type Filter (Semua | Pengeluaran | Pemasukan | Transfer) */}
+      <View style={styles.typeSegmentWrapper}>
+        <View style={styles.typeSegmentContainer}>
           <TouchableOpacity
-            key={w.id}
+            style={[
+              styles.segmentBtn,
+              filterType === 'all' && styles.segmentBtnActiveAll,
+            ]}
+            onPress={() => setFilterType('all')}
+            activeOpacity={0.7}
+          >
+            <Text
+              style={[
+                styles.segmentText,
+                filterType === 'all' && styles.segmentTextActive,
+              ]}
+            >
+              Semua
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.segmentBtn,
+              filterType === 'expense' && styles.segmentBtnActiveExpense,
+            ]}
+            onPress={() => setFilterType('expense')}
+            activeOpacity={0.7}
+          >
+            <Text
+              style={[
+                styles.segmentText,
+                filterType === 'expense' && styles.segmentTextActive,
+              ]}
+            >
+              Keluar
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.segmentBtn,
+              filterType === 'income' && styles.segmentBtnActiveIncome,
+            ]}
+            onPress={() => setFilterType('income')}
+            activeOpacity={0.7}
+          >
+            <Text
+              style={[
+                styles.segmentText,
+                filterType === 'income' && styles.segmentTextActive,
+              ]}
+            >
+              Masuk
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.segmentBtn,
+              filterType === 'transfer' && styles.segmentBtnActiveTransfer,
+            ]}
+            onPress={() => setFilterType('transfer')}
+            activeOpacity={0.7}
+          >
+            <Text
+              style={[
+                styles.segmentText,
+                filterType === 'transfer' && styles.segmentTextActive,
+              ]}
+            >
+              Transfer
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Row 2: Source Wallet Filter (Scrollable with explicit container height to prevent any overlap) */}
+      <View style={styles.walletFilterSection}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.walletFilterContent}
+          style={styles.walletFilterScroll}
+        >
+          <TouchableOpacity
             style={[
               styles.walletChip,
-              filterWalletId === w.id && styles.walletChipActive,
+              filterWalletId === 'all' && styles.walletChipActive,
             ]}
-            onPress={() => setFilterWalletId(w.id)}
+            onPress={() => setFilterWalletId('all')}
+            activeOpacity={0.7}
           >
-            <Ionicons
-              name={(w.icon as any) || 'wallet'}
-              size={12}
-              color={filterWalletId === w.id ? '#FFFFFF' : w.color}
-              style={{ marginRight: 4 }}
-            />
             <Text
               style={[
                 styles.walletChipText,
-                filterWalletId === w.id && styles.walletChipTextActive,
+                filterWalletId === 'all' && styles.walletChipTextActive,
               ]}
             >
-              {w.name}
+              Semua Dompet
             </Text>
           </TouchableOpacity>
-        ))}
-      </ScrollView>
 
-      {/* Main List */}
+          {wallets.map((w) => (
+            <TouchableOpacity
+              key={w.id}
+              style={[
+                styles.walletChip,
+                filterWalletId === w.id && styles.walletChipActive,
+              ]}
+              onPress={() => setFilterWalletId(w.id)}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name={(w.icon as any) || 'wallet'}
+                size={12}
+                color={filterWalletId === w.id ? '#FFFFFF' : w.color}
+                style={{ marginRight: 5 }}
+              />
+              <Text
+                style={[
+                  styles.walletChipText,
+                  filterWalletId === w.id && styles.walletChipTextActive,
+                ]}
+              >
+                {w.name}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+
+      {/* Main Transaction List */}
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
@@ -238,7 +240,7 @@ export const TransactionsScreen: React.FC<TransactionsScreenProps> = ({ onAddPre
         )}
 
         {/* Space for bottom navbar */}
-        <View style={{ height: 100 }} />
+        <View style={{ height: 110 }} />
       </ScrollView>
     </View>
   );
@@ -255,7 +257,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: Spacing.xl,
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
   },
   title: {
     fontSize: Typography.sizes.xl,
@@ -300,13 +302,66 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.sm,
     paddingVertical: 0,
   },
-  filterRow: {
+
+  // Segmented Type Filter
+  typeSegmentWrapper: {
+    paddingHorizontal: Spacing.xl,
+    marginBottom: Spacing.xs,
+  },
+  typeSegmentContainer: {
+    flexDirection: 'row',
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.lg,
+    padding: 3,
+    borderWidth: 1,
+    borderColor: Colors.surfaceBorder,
+  },
+  segmentBtn: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 7,
+    borderRadius: Radius.md,
+  },
+  segmentBtnActiveAll: {
+    backgroundColor: Colors.primary,
+  },
+  segmentBtnActiveExpense: {
+    backgroundColor: Colors.expense,
+  },
+  segmentBtnActiveIncome: {
+    backgroundColor: Colors.income,
+  },
+  segmentBtnActiveTransfer: {
+    backgroundColor: Colors.transfer,
+  },
+  segmentText: {
+    fontSize: Typography.sizes.xs,
+    color: Colors.textSecondary,
+    fontWeight: Typography.weights.medium,
+  },
+  segmentTextActive: {
+    color: '#FFFFFF',
+    fontWeight: Typography.weights.bold,
+  },
+
+  // Wallet Filter Section
+  walletFilterSection: {
+    marginBottom: Spacing.sm,
+    marginTop: 2,
+  },
+  walletFilterScroll: {
+    flexGrow: 0,
+  },
+  walletFilterContent: {
     paddingHorizontal: Spacing.xl,
     gap: Spacing.xs,
-    marginBottom: Spacing.xs,
-    paddingVertical: 4,
+    alignItems: 'center',
+    paddingVertical: 2,
   },
-  filterChip: {
+  walletChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: Colors.surface,
     paddingHorizontal: Spacing.md,
     paddingVertical: 6,
@@ -314,59 +369,20 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.surfaceBorder,
   },
-  filterChipActive: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
-  },
-  filterChipActiveExpense: {
-    backgroundColor: Colors.expense,
-    borderColor: Colors.expense,
-  },
-  filterChipActiveIncome: {
-    backgroundColor: Colors.income,
-    borderColor: Colors.income,
-  },
-  filterChipActiveTransfer: {
-    backgroundColor: Colors.transfer,
-    borderColor: Colors.transfer,
-  },
-  filterChipText: {
-    fontSize: Typography.sizes.xs,
-    color: Colors.textSecondary,
-    fontWeight: Typography.weights.medium,
-  },
-  filterChipTextActive: {
-    color: '#FFFFFF',
-    fontWeight: Typography.weights.bold,
-  },
-  walletFilterRow: {
-    paddingHorizontal: Spacing.xl,
-    gap: Spacing.xs,
-    marginBottom: Spacing.sm,
-    paddingVertical: 2,
-  },
-  walletChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: 4,
-    borderRadius: Radius.sm,
-    borderWidth: 1,
-    borderColor: 'transparent',
-  },
   walletChipActive: {
-    backgroundColor: Colors.surfaceLight,
+    backgroundColor: 'rgba(99, 102, 241, 0.2)',
     borderColor: Colors.primary,
   },
   walletChipText: {
-    fontSize: 10,
-    color: Colors.textTertiary,
+    fontSize: 11,
+    color: Colors.textSecondary,
+    fontWeight: Typography.weights.medium,
   },
   walletChipTextActive: {
     color: Colors.textPrimary,
     fontWeight: Typography.weights.bold,
   },
+
   listContent: {
     paddingHorizontal: Spacing.xl,
     paddingTop: Spacing.xs,

@@ -11,9 +11,7 @@ import { useMoney } from '../context/MoneyContext';
 import { PeriodFilterBar } from '../components/PeriodFilterBar';
 import { PieChart } from '../components/PieChart';
 import { CashflowChart } from '../components/CashflowChart';
-import { CategoryBreakdown } from '../components/CategoryBreakdown';
 import { formatRupiah } from '../utils/formatters';
-import { Ionicons } from '@expo/vector-icons';
 
 export const AnalyticsScreen: React.FC = () => {
   const {
@@ -21,7 +19,6 @@ export const AnalyticsScreen: React.FC = () => {
     expenseCategorySummaries,
     incomeCategorySummaries,
     isPrivacyMode,
-    periodState,
   } = useMoney();
 
   const [chartType, setChartType] = useState<'expense' | 'income'>('expense');
@@ -40,11 +37,11 @@ export const AnalyticsScreen: React.FC = () => {
       <View style={styles.header}>
         <Text style={styles.title}>Analisis & Statistik</Text>
         <Text style={styles.subtitle}>
-          Visualisasi mendalam arus kas dan pengeluaranmu
+          Visualisasi grafik arus kas dan distribusi keuangan
         </Text>
       </View>
 
-      {/* Flexible Period Filter */}
+      {/* Flexible Month Navigator */}
       <PeriodFilterBar />
 
       {/* Summary Cards Row */}
@@ -52,7 +49,7 @@ export const AnalyticsScreen: React.FC = () => {
         <View style={styles.summaryCard}>
           <View style={styles.summaryHeader}>
             <View style={[styles.dot, { backgroundColor: Colors.income }]} />
-            <Text style={styles.summaryLabel}>Total Masuk</Text>
+            <Text style={styles.summaryLabel}>Total Pemasukan</Text>
           </View>
           <Text style={[styles.summaryVal, { color: Colors.income }]} numberOfLines={1}>
             {formatRupiah(cashflow.income, isPrivacyMode)}
@@ -62,7 +59,7 @@ export const AnalyticsScreen: React.FC = () => {
         <View style={styles.summaryCard}>
           <View style={styles.summaryHeader}>
             <View style={[styles.dot, { backgroundColor: Colors.expense }]} />
-            <Text style={styles.summaryLabel}>Total Keluar</Text>
+            <Text style={styles.summaryLabel}>Total Pengeluaran</Text>
           </View>
           <Text style={[styles.summaryVal, { color: Colors.expense }]} numberOfLines={1}>
             {formatRupiah(cashflow.expense, isPrivacyMode)}
@@ -70,7 +67,7 @@ export const AnalyticsScreen: React.FC = () => {
         </View>
       </View>
 
-      {/* Pie Chart Card */}
+      {/* Pie / Donut Chart Card */}
       <View style={styles.card}>
         <View style={styles.cardHeader}>
           <Text style={styles.cardTitle}>Distribusi Kategori (Pie Chart)</Text>
@@ -117,11 +114,8 @@ export const AnalyticsScreen: React.FC = () => {
         <PieChart data={activeSummaries} isPrivacyMode={isPrivacyMode} />
       </View>
 
-      {/* Cashflow Bar Chart */}
+      {/* Cashflow Bar Chart (Pemasukan vs Pengeluaran Tren) */}
       <CashflowChart />
-
-      {/* Detailed Category Progress Bars */}
-      <CategoryBreakdown />
 
       {/* Bottom padding for floating navbar */}
       <View style={{ height: 110 }} />
