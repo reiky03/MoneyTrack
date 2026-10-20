@@ -7,7 +7,9 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius } from '../constants/theme';
@@ -214,9 +216,21 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
       animationType="slide"
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
-        <View style={styles.container}>
-          {/* Header */}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardAvoidingView}
+      >
+        <View style={styles.overlay}>
+          <TouchableOpacity
+            style={styles.backdropTouchable}
+            activeOpacity={1}
+            onPress={() => {
+              Keyboard.dismiss();
+              onClose();
+            }}
+          />
+          <View style={styles.container}>
+            {/* Header */}
           <View style={styles.header}>
             <Text style={styles.title}>
               {type === 'expense'
@@ -299,7 +313,12 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
             </TouchableOpacity>
           </View>
 
-          <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollBody}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            style={styles.scrollBody}
+            contentContainerStyle={{ paddingBottom: Spacing.lg }}
+          >
             {/* Amount Big Display & Input */}
             <View style={styles.amountBox}>
               <Text style={styles.currencyLabel}>NOMINAL TRANSAKSI</Text>
@@ -642,6 +661,7 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
           </TouchableOpacity>
         </View>
       </View>
+    </KeyboardAvoidingView>
 
       {/* Add Category Modal */}
       <AddCategoryModal
@@ -655,6 +675,16 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
 };
 
 const styles = StyleSheet.create({
+  keyboardAvoidingView: {
+    flex: 1,
+  },
+  backdropTouchable: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.75)',
@@ -671,6 +701,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.surfaceBorder,
     width: '100%',
     maxWidth: 480,
+    flexShrink: 1,
   },
   header: {
     flexDirection: 'row',
@@ -722,7 +753,8 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weights.bold,
   },
   scrollBody: {
-    maxHeight: 480,
+    flexShrink: 1,
+    maxHeight: 520,
   },
   amountBox: {
     backgroundColor: Colors.surface,

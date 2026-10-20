@@ -7,7 +7,9 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius } from '../constants/theme';
@@ -129,25 +131,41 @@ export const EditWalletModal: React.FC<EditWalletModalProps> = ({
       animationType="slide"
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
-        <View style={styles.container}>
-          {/* Header */}
-          <View style={styles.header}>
-            <View>
-              <Text style={styles.title}>Edit & Penyesuaian Saldo</Text>
-              <Text style={styles.subtitle}>Sesuaikan saldo riil dan rincian akun</Text>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardAvoidingView}
+      >
+        <View style={styles.overlay}>
+          <TouchableOpacity
+            style={styles.backdropTouchable}
+            activeOpacity={1}
+            onPress={() => {
+              Keyboard.dismiss();
+              onClose();
+            }}
+          />
+          <View style={styles.container}>
+            {/* Header */}
+            <View style={styles.header}>
+              <View>
+                <Text style={styles.title}>Edit & Penyesuaian Saldo</Text>
+                <Text style={styles.subtitle}>Sesuaikan saldo riil dan rincian akun</Text>
+              </View>
+              <View style={styles.headerRight}>
+                <TouchableOpacity onPress={handleDelete} style={styles.deleteIconBtn}>
+                  <Ionicons name="trash-outline" size={18} color={Colors.expense} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
+                  <Ionicons name="close" size={20} color={Colors.textSecondary} />
+                </TouchableOpacity>
+              </View>
             </View>
-            <View style={styles.headerRight}>
-              <TouchableOpacity onPress={handleDelete} style={styles.deleteIconBtn}>
-                <Ionicons name="trash-outline" size={18} color={Colors.expense} />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-                <Ionicons name="close" size={20} color={Colors.textSecondary} />
-              </TouchableOpacity>
-            </View>
-          </View>
 
-          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              contentContainerStyle={styles.scroll}
+            >
             {/* Balance Adjustment Section (Main Highlight) */}
             <View style={styles.balanceSection}>
               <View style={styles.balanceHeaderRow}>
@@ -259,15 +277,27 @@ export const EditWalletModal: React.FC<EditWalletModalProps> = ({
           </ScrollView>
         </View>
       </View>
-    </Modal>
+    </KeyboardAvoidingView>
+  </Modal>
   );
 };
 
 const styles = StyleSheet.create({
+  keyboardAvoidingView: {
+    flex: 1,
+  },
+  backdropTouchable: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.75)',
     justifyContent: 'flex-end',
+    alignItems: 'center',
   },
   container: {
     backgroundColor: Colors.backgroundElevated,
@@ -277,6 +307,9 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.xl,
     borderWidth: 1,
     borderColor: Colors.surfaceBorder,
+    width: '100%',
+    maxWidth: 480,
+    flexShrink: 1,
   },
   header: {
     flexDirection: 'row',

@@ -7,6 +7,9 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius } from '../constants/theme';
@@ -94,17 +97,33 @@ export const AddWalletModal: React.FC<AddWalletModalProps> = ({
       animationType="slide"
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
-        <View style={styles.container}>
-          {/* Header */}
-          <View style={styles.header}>
-            <Text style={styles.title}>Tambah Sumber Uang / Dompet</Text>
-            <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-              <Ionicons name="close" size={20} color={Colors.textSecondary} />
-            </TouchableOpacity>
-          </View>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardAvoidingView}
+      >
+        <View style={styles.overlay}>
+          <TouchableOpacity
+            style={styles.backdropTouchable}
+            activeOpacity={1}
+            onPress={() => {
+              Keyboard.dismiss();
+              onClose();
+            }}
+          />
+          <View style={styles.container}>
+            {/* Header */}
+            <View style={styles.header}>
+              <Text style={styles.title}>Tambah Sumber Uang / Dompet</Text>
+              <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
+                <Ionicons name="close" size={20} color={Colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
 
-          <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              contentContainerStyle={{ paddingBottom: Spacing.md }}
+            >
             {/* Wallet Type Selection */}
             <Text style={styles.inputLabel}>TIPE SUMBER DANA</Text>
             <View style={styles.typeGrid}>
@@ -202,15 +221,27 @@ export const AddWalletModal: React.FC<AddWalletModalProps> = ({
           </TouchableOpacity>
         </View>
       </View>
-    </Modal>
+    </KeyboardAvoidingView>
+  </Modal>
   );
 };
 
 const styles = StyleSheet.create({
+  keyboardAvoidingView: {
+    flex: 1,
+  },
+  backdropTouchable: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.75)',
     justifyContent: 'flex-end',
+    alignItems: 'center',
   },
   container: {
     backgroundColor: Colors.backgroundElevated,
@@ -220,6 +251,9 @@ const styles = StyleSheet.create({
     maxHeight: '90%',
     borderWidth: 1,
     borderColor: Colors.surfaceBorder,
+    width: '100%',
+    maxWidth: 480,
+    flexShrink: 1,
   },
   header: {
     flexDirection: 'row',

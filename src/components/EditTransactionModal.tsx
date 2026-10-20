@@ -7,7 +7,9 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius } from '../constants/theme';
@@ -237,9 +239,21 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
       animationType="slide"
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
-        <View style={styles.container}>
-          {/* Header */}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardAvoidingView}
+      >
+        <View style={styles.overlay}>
+          <TouchableOpacity
+            style={styles.backdropTouchable}
+            activeOpacity={1}
+            onPress={() => {
+              Keyboard.dismiss();
+              onClose();
+            }}
+          />
+          <View style={styles.container}>
+            {/* Header */}
           <View style={styles.header}>
             <View>
               <Text style={styles.headerTitle}>Edit Transaksi</Text>
@@ -255,7 +269,11 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
             </View>
           </View>
 
-          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={styles.scroll}
+          >
             {/* Type Switcher */}
             <View style={styles.typeSwitcher}>
               <TouchableOpacity
@@ -696,24 +714,36 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
             </TouchableOpacity>
           </ScrollView>
         </View>
-
-        {/* Add Category Submodal */}
-        <AddCategoryModal
-          visible={showAddCategoryModal}
-          initialType={type === 'income' ? 'income' : 'expense'}
-          onClose={() => setShowAddCategoryModal(false)}
-          onCategoryCreated={(newCat) => setSelectedCategoryId(newCat.id)}
-        />
       </View>
-    </Modal>
+
+      {/* Add Category Submodal */}
+      <AddCategoryModal
+        visible={showAddCategoryModal}
+        initialType={type === 'income' ? 'income' : 'expense'}
+        onClose={() => setShowAddCategoryModal(false)}
+        onCategoryCreated={(newCat) => setSelectedCategoryId(newCat.id)}
+      />
+    </KeyboardAvoidingView>
+  </Modal>
   );
 };
 
 const styles = StyleSheet.create({
+  keyboardAvoidingView: {
+    flex: 1,
+  },
+  backdropTouchable: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.75)',
     justifyContent: 'flex-end',
+    alignItems: 'center',
   },
   container: {
     backgroundColor: Colors.backgroundElevated,
@@ -723,6 +753,9 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.xl,
     borderWidth: 1,
     borderColor: Colors.surfaceBorder,
+    width: '100%',
+    maxWidth: 480,
+    flexShrink: 1,
   },
   header: {
     flexDirection: 'row',
