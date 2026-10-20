@@ -5,8 +5,9 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
+  ActivityIndicator,
 } from 'react-native';
+import * as Updates from 'expo-updates';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius } from '../constants/theme';
 import { useMoney } from '../context/MoneyContext';
@@ -15,6 +16,7 @@ import { Wallet } from '../types';
 import { formatRupiah } from '../utils/formatters';
 import { AddWalletModal } from '../components/AddWalletModal';
 import { EditWalletModal } from '../components/EditWalletModal';
+import { UpdatePromptModal } from '../components/UpdatePromptModal';
 
 export const WalletsScreen: React.FC = () => {
   const {
@@ -28,7 +30,42 @@ export const WalletsScreen: React.FC = () => {
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingWallet, setEditingWallet] = useState<Wallet | null>(null);
+  const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
+  const [manualCheckTrigger, setManualCheckTrigger] = useState(0);
   const { showAlert, showConfirm } = useAlert();
+
+  const handleManualCheckUpdate = async () => {
+    if (!Updates.isEnabled) {
+      showAlert({
+        title: 'Versi Terkini 🎉',
+        message: 'Aplikasi kamu saat ini sudah menggunakan versi paling mutakhir (v1.2.0).',
+        type: 'info',
+      });
+      return;
+    }
+
+    try {
+      setIsCheckingUpdate(true);
+      const check = await Updates.checkForUpdateAsync();
+      if (check.isAvailable) {
+        setManualCheckTrigger((c) => c + 1);
+      } else {
+        showAlert({
+          title: 'Versi Terkini 🎉',
+          message: 'Aplikasi kamu sudah menggunakan pembaruan terbaru (v1.2.0). Belum ada update baru.',
+          type: 'info',
+        });
+      }
+    } catch {
+      showAlert({
+        title: 'Gagal Memeriksa',
+        message: 'Tidak dapat memeriksa pembaruan. Pastikan perangkatmu terhubung ke internet ya beb.',
+        type: 'warning',
+      });
+    } finally {
+      setIsCheckingUpdate(false);
+    }
+  };
 
   const handleDelete = (wallet: Wallet) => {
     if (wallets.length <= 1) {
@@ -178,6 +215,35 @@ export const WalletsScreen: React.FC = () => {
         </Text>
       </TouchableOpacity>
 
+      {/* App Version & OTA Update Check Section */}
+      <View style={styles.updateSection}>
+        <View style={styles.updateHeaderRow}>
+          <View style={styles.updateIconCircle}>
+            <Ionicons name="sparkles" size={16} color={Colors.primaryLight} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.updateTitle}>Pembaruan Sistem (OTA)</Text>
+            <Text style={styles.updateSub}>MoneyTrack v1.2.0 • Otomatis via Internet</Text>
+          </View>
+        </View>
+
+        <TouchableOpacity
+          style={styles.checkUpdateBtn}
+          onPress={handleManualCheckUpdate}
+          disabled={isCheckingUpdate}
+          activeOpacity={0.8}
+        >
+          {isCheckingUpdate ? (
+            <ActivityIndicator size="small" color="#FFFFFF" />
+          ) : (
+            <Ionicons name="sync-outline" size={15} color="#FFFFFF" />
+          )}
+          <Text style={styles.checkUpdateBtnText}>
+            {isCheckingUpdate ? 'Memeriksa...' : 'Periksa Pembaruan'}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       {/* Space for bottom navbar */}
       <View style={{ height: 110 }} />
     </ScrollView>
@@ -194,6 +260,9 @@ export const WalletsScreen: React.FC = () => {
         wallet={editingWallet}
         onClose={() => setEditingWallet(null)}
       />
+
+      {/* Update Prompt Modal on Manual Trigger */}
+      <UpdatePromptModal manualCheckTrigger={manualCheckTrigger} />
     </View>
   );
 };
@@ -377,5 +446,52 @@ const styles = StyleSheet.create({
   resetBtnText: {
     fontSize: Typography.sizes.xs,
     color: Colors.textTertiary,
+  },
+  updateSection: {
+    backgroundColor: Colors.surface,
+    marginHorizontal: Spacing.xl,
+    marginTop: Spacing.md,
+    padding: Spacing.lg,
+    borderRadius: Radius.xl,
+    borderWidth: 1,
+    borderColor: 'rgba(99, 102, 241, 0.2)',
+  },
+  updateHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    marginBottom: Spacing.md,
+  },
+  updateIconCircle: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: 'rgba(99, 102, 241, 0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  updateTitle: {
+    fontSize: Typography.sizes.sm,
+    fontWeight: Typography.weights.bold,
+    color: Colors.textPrimary,
+  },
+  updateSub: {
+    fontSize: 11,
+    color: Colors.textTertiary,
+    marginTop: 2,
+  },
+  checkUpdateBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: Colors.primary,
+    paddingVertical: 10,
+    borderRadius: Radius.lg,
+  },
+  checkUpdateBtnText: {
+    fontSize: Typography.sizes.xs,
+    fontWeight: Typography.weights.bold,
+    color: '#FFFFFF',
   },
 });

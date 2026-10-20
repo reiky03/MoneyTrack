@@ -12,6 +12,7 @@ import { AnalyticsScreen } from './src/screens/AnalyticsScreen';
 import { WalletsScreen } from './src/screens/WalletsScreen';
 import { FloatingNavBar, NavTab } from './src/components/FloatingNavBar';
 import { AddTransactionModal } from './src/components/AddTransactionModal';
+import { UpdatePromptModal } from './src/components/UpdatePromptModal';
 import { SplashScreen } from './src/components/SplashScreen';
 import { Colors } from './src/constants/theme';
 
@@ -61,6 +62,9 @@ function MainApp() {
             visible={showAddTxModal}
             onClose={() => setShowAddTxModal(false)}
           />
+
+          {/* Auto In-App Update Prompt Modal */}
+          <UpdatePromptModal />
         </View>
       </View>
     </View>
