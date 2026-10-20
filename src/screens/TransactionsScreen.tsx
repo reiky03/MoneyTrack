@@ -12,7 +12,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius } from '../constants/theme';
 import { useMoney } from '../context/MoneyContext';
 import { TransactionItem } from '../components/TransactionItem';
-import { TransactionType } from '../types';
+import { EditTransactionModal } from '../components/EditTransactionModal';
+import { Transaction, TransactionType } from '../types';
 import { formatRupiah } from '../utils/formatters';
 
 interface TransactionsScreenProps {
@@ -26,6 +27,7 @@ export const TransactionsScreen: React.FC<TransactionsScreenProps> = ({ onAddPre
   const [filterWalletId, setFilterWalletId] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showWalletModal, setShowWalletModal] = useState<boolean>(false);
+  const [editingTx, setEditingTx] = useState<Transaction | null>(null);
 
   // Selected wallet object
   const selectedWallet = wallets.find((w) => w.id === filterWalletId);
@@ -210,7 +212,11 @@ export const TransactionsScreen: React.FC<TransactionsScreenProps> = ({ onAddPre
           </View>
         ) : (
           displayed.map((tx) => (
-            <TransactionItem key={tx.id} transaction={tx} />
+            <TransactionItem
+              key={tx.id}
+              transaction={tx}
+              onEdit={(item) => setEditingTx(item)}
+            />
           ))
         )}
 
@@ -311,6 +317,13 @@ export const TransactionsScreen: React.FC<TransactionsScreenProps> = ({ onAddPre
           </View>
         </TouchableOpacity>
       </Modal>
+
+      {/* Edit Transaction Modal */}
+      <EditTransactionModal
+        visible={!!editingTx}
+        transaction={editingTx}
+        onClose={() => setEditingTx(null)}
+      />
     </View>
   );
 };
@@ -319,7 +332,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
-    paddingTop: Spacing.md,
+    paddingTop: Spacing.sm,
   },
   header: {
     flexDirection: 'row',

@@ -18,12 +18,14 @@ interface ManageWalletsModalProps {
   visible: boolean;
   onClose: () => void;
   onAddWalletPress: () => void;
+  onEditWalletPress?: (wallet: Wallet) => void;
 }
 
 export const ManageWalletsModal: React.FC<ManageWalletsModalProps> = ({
   visible,
   onClose,
   onAddWalletPress,
+  onEditWalletPress,
 }) => {
   const { wallets, deleteWallet, resetAllData, isPrivacyMode } = useMoney();
 
@@ -105,12 +107,26 @@ export const ManageWalletsModal: React.FC<ManageWalletsModalProps> = ({
                   </Text>
                 </View>
 
-                <TouchableOpacity
-                  style={styles.deleteBtn}
-                  onPress={() => handleDeleteWallet(wallet)}
-                >
-                  <Ionicons name="trash-outline" size={18} color={Colors.expense} />
-                </TouchableOpacity>
+                <View style={styles.actionRow}>
+                  {onEditWalletPress && (
+                    <TouchableOpacity
+                      style={styles.actionBtn}
+                      onPress={() => {
+                        onClose();
+                        onEditWalletPress(wallet);
+                      }}
+                    >
+                      <Ionicons name="create-outline" size={17} color={Colors.primaryLight} />
+                    </TouchableOpacity>
+                  )}
+
+                  <TouchableOpacity
+                    style={styles.actionBtn}
+                    onPress={() => handleDeleteWallet(wallet)}
+                  >
+                    <Ionicons name="trash-outline" size={17} color={Colors.expense} />
+                  </TouchableOpacity>
+                </View>
               </View>
             ))}
 
@@ -206,8 +222,15 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     marginTop: 2,
   },
-  deleteBtn: {
+  actionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+  },
+  actionBtn: {
     padding: Spacing.xs,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: Radius.md,
   },
   addNewBtn: {
     flexDirection: 'row',

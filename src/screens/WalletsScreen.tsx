@@ -13,6 +13,7 @@ import { useMoney } from '../context/MoneyContext';
 import { Wallet } from '../types';
 import { formatRupiah } from '../utils/formatters';
 import { AddWalletModal } from '../components/AddWalletModal';
+import { EditWalletModal } from '../components/EditWalletModal';
 
 export const WalletsScreen: React.FC = () => {
   const {
@@ -20,10 +21,12 @@ export const WalletsScreen: React.FC = () => {
     totalBalance,
     isPrivacyMode,
     deleteWallet,
+    clearAllTransactions,
     resetAllData,
   } = useMoney();
 
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingWallet, setEditingWallet] = useState<Wallet | null>(null);
 
   const handleDelete = (wallet: Wallet) => {
     if (wallets.length <= 1) {
@@ -45,29 +48,25 @@ export const WalletsScreen: React.FC = () => {
     );
   };
 
-  const handleReset = () => {
+  const handleClearTransactions = () => {
     Alert.alert(
-      'Reset Data Demo',
-      'Apakah kamu ingin mengembalikan data ke kondisi awal contoh?',
+      'Kosongkan Transaksi',
+      'Yakin ingin menghapus seluruh riwayat transaksi untuk mulai mencatat keuangan asli?',
       [
         { text: 'Batal', style: 'cancel' },
         {
-          text: 'Reset',
+          text: 'Kosongkan',
           style: 'destructive',
-          onPress: () => resetAllData(),
+          onPress: () => clearAllTransactions(),
         },
       ]
     );
   };
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      showsVerticalScrollIndicator={false}
-    >
-      {/* Header */}
-      <View style={styles.header}>
+    <View style={styles.container}>
+      {/* Top Fixed Header */}
+      <View style={styles.fixedHeader}>
         <View>
           <Text style={styles.title}>Dompet & Sumber Uang</Text>
           <Text style={styles.subtitle}>
@@ -84,6 +83,12 @@ export const WalletsScreen: React.FC = () => {
           <Text style={styles.addBtnText}>Tambah</Text>
         </TouchableOpacity>
       </View>
+
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
 
       {/* Total Net Worth Card */}
       <View style={styles.netWorthCard}>
@@ -122,44 +127,76 @@ export const WalletsScreen: React.FC = () => {
                 </Text>
               </View>
 
-              <TouchableOpacity
-                style={styles.trashBtn}
-                onPress={() => handleDelete(wallet)}
-              >
-                <Ionicons name="trash-outline" size={18} color={Colors.textTertiary} />
-              </TouchableOpacity>
+              <View style={styles.walletActions}>
+                <TouchableOpacity
+                  style={styles.editBtn}
+                  onPress={() => setEditingWallet(wallet)}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="create-outline" size={14} color={Colors.primaryLight} />
+                  <Text style={styles.editBtnText}>Edit</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.trashBtn}
+                  onPress={() => handleDelete(wallet)}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="trash-outline" size={16} color={Colors.textTertiary} />
+                </TouchableOpacity>
+              </View>
             </View>
 
             {/* Bottom row */}
-            <View style={styles.walletBottom}>
-              <Text style={styles.balanceLabel}>Saldo Saat Ini</Text>
-              <Text style={styles.balanceVal}>
-                {formatRupiah(wallet.balance, isPrivacyMode)}
-              </Text>
-            </View>
+            <TouchableOpacity
+              style={styles.walletBottom}
+              onPress={() => setEditingWallet(wallet)}
+              activeOpacity={0.75}
+            >
+              <View>
+                <Text style={styles.balanceLabel}>Saldo Saat Ini</Text>
+                <Text style={styles.balanceVal}>
+                  {formatRupiah(wallet.balance, isPrivacyMode)}
+                </Text>
+              </View>
+              <View style={styles.adjustPill}>
+                <Ionicons name="options-outline" size={13} color={Colors.primaryLight} />
+                <Text style={styles.adjustPillText}>Sesuaikan Saldo</Text>
+              </View>
+            </TouchableOpacity>
           </View>
         ))}
       </View>
 
-      {/* Reset Data Button */}
+      {/* Clear Transactions Button */}
       <TouchableOpacity
         style={styles.resetBtn}
-        onPress={handleReset}
+        onPress={handleClearTransactions}
         activeOpacity={0.7}
       >
-        <Ionicons name="refresh-outline" size={16} color={Colors.textTertiary} />
-        <Text style={styles.resetBtnText}>Reset ke Data Awal (Demo)</Text>
+        <Ionicons name="trash-outline" size={15} color={Colors.expense} />
+        <Text style={[styles.resetBtnText, { color: Colors.expense }]}>
+          Kosongkan Seluruh Riwayat Transaksi
+        </Text>
       </TouchableOpacity>
 
       {/* Space for bottom navbar */}
       <View style={{ height: 110 }} />
+    </ScrollView>
 
       {/* Add Wallet Modal */}
       <AddWalletModal
         visible={showAddModal}
         onClose={() => setShowAddModal(false)}
       />
-    </ScrollView>
+
+      {/* Edit Wallet Modal */}
+      <EditWalletModal
+        visible={!!editingWallet}
+        wallet={editingWallet}
+        onClose={() => setEditingWallet(null)}
+      />
+    </View>
   );
 };
 
@@ -168,15 +205,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
-  content: {
-    paddingTop: Spacing.md,
-  },
-  header: {
+  fixedHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: Spacing.xl,
-    marginBottom: Spacing.md,
+    paddingTop: Spacing.sm,
+    paddingBottom: Spacing.md,
+    backgroundColor: Colors.background,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+    zIndex: 10,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  content: {
+    paddingTop: Spacing.sm,
   },
   title: {
     fontSize: Typography.sizes.xl,
@@ -265,13 +310,34 @@ const styles = StyleSheet.create({
     marginTop: 2,
     fontWeight: Typography.weights.medium,
   },
+  walletActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+  },
+  editBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(99, 102, 241, 0.12)',
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: Radius.md,
+  },
+  editBtnText: {
+    fontSize: 11,
+    color: Colors.primaryLight,
+    fontWeight: Typography.weights.semibold,
+  },
   trashBtn: {
     padding: Spacing.xs,
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    borderRadius: Radius.md,
   },
   walletBottom: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     borderTopWidth: 1,
     borderTopColor: Colors.surfaceBorder,
     paddingTop: Spacing.sm,
@@ -284,6 +350,22 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.lg,
     fontWeight: Typography.weights.bold,
     color: Colors.textPrimary,
+  },
+  adjustPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: Radius.full,
+    borderWidth: 1,
+    borderColor: 'rgba(99, 102, 241, 0.25)',
+  },
+  adjustPillText: {
+    fontSize: 10,
+    color: Colors.primaryLight,
+    fontWeight: Typography.weights.semibold,
   },
   resetBtn: {
     flexDirection: 'row',

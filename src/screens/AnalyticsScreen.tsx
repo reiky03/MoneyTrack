@@ -28,21 +28,22 @@ export const AnalyticsScreen: React.FC = () => {
     : incomeCategorySummaries;
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      showsVerticalScrollIndicator={false}
-    >
-      {/* Header */}
-      <View style={styles.header}>
+    <View style={styles.container}>
+      {/* Fixed Top Header */}
+      <View style={styles.fixedHeader}>
         <Text style={styles.title}>Analisis & Statistik</Text>
         <Text style={styles.subtitle}>
           Visualisasi grafik arus kas dan distribusi keuangan
         </Text>
       </View>
 
-      {/* Flexible Month Navigator */}
-      <PeriodFilterBar />
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Flexible Month Navigator */}
+        <PeriodFilterBar />
 
       {/* Summary Cards Row */}
       <View style={styles.summaryRow}>
@@ -120,6 +121,7 @@ export const AnalyticsScreen: React.FC = () => {
       {/* Bottom padding for floating navbar */}
       <View style={{ height: 110 }} />
     </ScrollView>
+    </View>
   );
 };
 
@@ -128,12 +130,20 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
-  content: {
-    paddingTop: Spacing.md,
-  },
-  header: {
+  fixedHeader: {
     paddingHorizontal: Spacing.xl,
-    marginBottom: Spacing.xs,
+    paddingTop: Spacing.sm,
+    paddingBottom: Spacing.md,
+    backgroundColor: Colors.background,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+    zIndex: 10,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  content: {
+    paddingTop: Spacing.sm,
   },
   title: {
     fontSize: Typography.sizes.xl,

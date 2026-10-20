@@ -10,11 +10,13 @@ import { formatDateIndonesian } from '../utils/dateUtils';
 interface TransactionItemProps {
   transaction: Transaction;
   onPress?: () => void;
+  onEdit?: (transaction: Transaction) => void;
 }
 
 export const TransactionItem: React.FC<TransactionItemProps> = ({
   transaction,
   onPress,
+  onEdit,
 }) => {
   const { categories, wallets, deleteTransaction, isPrivacyMode } = useMoney();
 
@@ -62,10 +64,18 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
     );
   };
 
+  const handleItemPress = () => {
+    if (onPress) {
+      onPress();
+    } else if (onEdit) {
+      onEdit(transaction);
+    }
+  };
+
   return (
     <TouchableOpacity
       style={styles.container}
-      onPress={onPress}
+      onPress={handleItemPress}
       onLongPress={handleDelete}
       activeOpacity={0.7}
     >
@@ -111,20 +121,32 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
         </View>
       </View>
 
-      {/* Amount & Delete */}
+      {/* Amount & Actions */}
       <View style={styles.rightCol}>
         <Text style={[styles.amount, { color: amountColor }]} numberOfLines={1}>
           {amountPrefix}
           {formatRupiah(transaction.amount, isPrivacyMode)}
         </Text>
 
-        <TouchableOpacity
-          style={styles.deleteButton}
-          onPress={handleDelete}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
-          <Ionicons name="trash-outline" size={14} color={Colors.textTertiary} />
-        </TouchableOpacity>
+        <View style={styles.actionButtons}>
+          {onEdit && (
+            <TouchableOpacity
+              style={styles.actionBtn}
+              onPress={() => onEdit(transaction)}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Ionicons name="create-outline" size={14} color={Colors.primaryLight} />
+            </TouchableOpacity>
+          )}
+
+          <TouchableOpacity
+            style={styles.actionBtn}
+            onPress={handleDelete}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Ionicons name="trash-outline" size={14} color={Colors.textTertiary} />
+          </TouchableOpacity>
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -197,8 +219,15 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.base,
     fontWeight: Typography.weights.bold,
   },
-  deleteButton: {
-    padding: 2,
-    opacity: 0.6,
+  actionButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    marginTop: 4,
+  },
+  actionBtn: {
+    padding: 3,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: Radius.sm,
   },
 });

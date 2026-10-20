@@ -17,8 +17,11 @@ import { PeriodFilterBar } from '../components/PeriodFilterBar';
 import { PieChart } from '../components/PieChart';
 import { TransactionItem } from '../components/TransactionItem';
 import { AddTransactionModal } from '../components/AddTransactionModal';
+import { EditTransactionModal } from '../components/EditTransactionModal';
 import { AddWalletModal } from '../components/AddWalletModal';
+import { EditWalletModal } from '../components/EditWalletModal';
 import { ManageWalletsModal } from '../components/ManageWalletsModal';
+import { Transaction, Wallet } from '../types';
 
 interface DashboardScreenProps {
   onNavigateToTransactions?: () => void;
@@ -41,6 +44,8 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
   const [showAddTxModal, setShowAddTxModal] = useState(false);
   const [showAddWalletModal, setShowAddWalletModal] = useState(false);
   const [showManageWalletsModal, setShowManageWalletsModal] = useState(false);
+  const [editingTx, setEditingTx] = useState<Transaction | null>(null);
+  const [editingWallet, setEditingWallet] = useState<Wallet | null>(null);
 
   if (isLoading) {
     return (
@@ -56,22 +61,24 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
 
   return (
     <View style={styles.container}>
+      {/* Top Header Fixed (tidak ikut terscroll) */}
+      <View style={styles.fixedHeader}>
+        <Header onOpenWallets={() => setShowManageWalletsModal(true)} />
+      </View>
+
       {/* Scrollable View */}
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Top Header with greeting, date & privacy toggle */}
-        <Header onOpenWallets={() => setShowManageWalletsModal(true)} />
-
         {/* Total Net Balance Card with Income/Expense cashflow */}
         <TotalBalanceCard />
 
         {/* Quick Wallets Horizontal Slider */}
         <WalletSlider
           onAddWalletPress={() => setShowAddWalletModal(true)}
-          onWalletManagePress={() => setShowManageWalletsModal(true)}
+          onWalletManagePress={(wallet) => setEditingWallet(wallet)}
         />
 
         {/* Period Month Navigator Bar */}
@@ -123,7 +130,11 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
             </View>
           ) : (
             recentTransactions.map((tx) => (
-              <TransactionItem key={tx.id} transaction={tx} />
+              <TransactionItem
+                key={tx.id}
+                transaction={tx}
+                onEdit={(item) => setEditingTx(item)}
+              />
             ))
           )}
         </View>
@@ -138,15 +149,28 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
         onClose={() => setShowAddTxModal(false)}
       />
 
+      <EditTransactionModal
+        visible={!!editingTx}
+        transaction={editingTx}
+        onClose={() => setEditingTx(null)}
+      />
+
       <AddWalletModal
         visible={showAddWalletModal}
         onClose={() => setShowAddWalletModal(false)}
+      />
+
+      <EditWalletModal
+        visible={!!editingWallet}
+        wallet={editingWallet}
+        onClose={() => setEditingWallet(null)}
       />
 
       <ManageWalletsModal
         visible={showManageWalletsModal}
         onClose={() => setShowManageWalletsModal(false)}
         onAddWalletPress={() => setShowAddWalletModal(true)}
+        onEditWalletPress={(wallet) => setEditingWallet(wallet)}
       />
     </View>
   );
@@ -169,11 +193,18 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     fontWeight: Typography.weights.medium,
   },
+  fixedHeader: {
+    backgroundColor: Colors.background,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+    zIndex: 10,
+  },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: Spacing.xxl,
+    paddingTop: Spacing.sm,
+    paddingBottom: Spacing.xxl + 40,
   },
   pieCard: {
     backgroundColor: Colors.surface,

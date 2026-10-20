@@ -40,7 +40,7 @@ export const PieChart: React.FC<PieChartProps> = ({ data, isPrivacyMode = false 
       {/* Donut Graphic */}
       <View style={styles.chartWrapper}>
         <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-          <G rotation="-90" origin={`${size / 2}, ${size / 2}`}>
+          <G transform={`rotate(-90 ${size / 2} ${size / 2})`}>
             {/* Background ring */}
             <Circle
               cx={size / 2}

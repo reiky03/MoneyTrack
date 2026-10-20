@@ -46,12 +46,19 @@ interface MoneyContextType {
   setPeriod: (type: PeriodType, customRange?: DateRange) => void;
   setSelectedWalletId: (id: string | null) => void;
   addTransaction: (data: Omit<Transaction, 'id' | 'createdAt'>) => Promise<void>;
+  updateTransaction: (transaction: Transaction) => Promise<void>;
   deleteTransaction: (id: string) => Promise<void>;
   addWallet: (data: Omit<Wallet, 'id' | 'createdAt' | 'balance'>) => Promise<void>;
   updateWallet: (wallet: Wallet) => Promise<void>;
+  adjustWalletBalance: (
+    walletId: string,
+    newBalance: number,
+    details?: Partial<Wallet>
+  ) => Promise<void>;
   deleteWallet: (id: string) => Promise<void>;
   addCategory: (data: Omit<Category, 'id' | 'createdAt'>) => Promise<Category>;
   deleteCategory: (id: string) => Promise<void>;
+  clearAllTransactions: () => Promise<void>;
   resetAllData: () => Promise<void>;
 }
 
@@ -168,6 +175,26 @@ export const MoneyProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     [transactions, wallets, triggerHaptic]
   );
 
+  // Update transaction
+  const updateTransaction = useCallback(
+    async (updatedTx: Transaction) => {
+      triggerHaptic();
+      const nextTxs = transactions.map((tx) =>
+        tx.id === updatedTx.id ? updatedTx : tx
+      );
+      const nextWallets = recomputeWalletBalances(wallets, nextTxs);
+
+      setTransactions(nextTxs);
+      setWallets(nextWallets);
+
+      await Promise.all([
+        StorageService.saveTransactions(nextTxs),
+        StorageService.saveWallets(nextWallets),
+      ]);
+    },
+    [transactions, wallets, triggerHaptic]
+  );
+
   // Add wallet
   const addWallet = useCallback(
     async (data: Omit<Wallet, 'id' | 'createdAt' | 'balance'>) => {
@@ -197,6 +224,44 @@ export const MoneyProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
       setWallets(recomputed);
       await StorageService.saveWallets(recomputed);
+    },
+    [wallets, transactions, triggerHaptic]
+  );
+
+  // Adjust wallet balance directly
+  const adjustWalletBalance = useCallback(
+    async (walletId: string, newBalance: number, details?: Partial<Wallet>) => {
+      triggerHaptic();
+      const target = wallets.find((w) => w.id === walletId);
+      if (!target) return;
+
+      // Calculate net transaction impact for this wallet
+      let txImpact = 0;
+      for (const tx of transactions) {
+        if (tx.type === 'income' && tx.walletId === walletId) txImpact += tx.amount;
+        if (tx.type === 'expense' && tx.walletId === walletId) txImpact -= tx.amount;
+        if (tx.type === 'transfer') {
+          if (tx.walletId === walletId) txImpact -= tx.amount;
+          if (tx.toWalletId === walletId) txImpact += tx.amount;
+        }
+      }
+
+      // newInitialBalance ensures recomputeWalletBalances results in exactly newBalance
+      const newInitialBalance = newBalance - txImpact;
+
+      const updatedWallet: Wallet = {
+        ...target,
+        ...details,
+        initialBalance: newInitialBalance,
+        balance: newBalance,
+      };
+
+      const nextWallets = wallets.map((w) =>
+        w.id === walletId ? updatedWallet : w
+      );
+
+      setWallets(nextWallets);
+      await StorageService.saveWallets(nextWallets);
     },
     [wallets, transactions, triggerHaptic]
   );
@@ -243,6 +308,23 @@ export const MoneyProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     },
     [categories, triggerHaptic]
   );
+
+  // Clear all transactions
+  const clearAllTransactions = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      await StorageService.clearAllTransactions();
+      setTransactions([]);
+      setWallets((prev) =>
+        prev.map((w) => ({
+          ...w,
+          balance: w.initialBalance ?? 0,
+        }))
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   // Reset all data
   const resetAllData = useCallback(async () => {
@@ -315,12 +397,15 @@ export const MoneyProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setPeriod,
         setSelectedWalletId,
         addTransaction,
+        updateTransaction,
         deleteTransaction,
         addWallet,
         updateWallet,
+        adjustWalletBalance,
         deleteWallet,
         addCategory,
         deleteCategory,
+        clearAllTransactions,
         resetAllData,
       }}
     >

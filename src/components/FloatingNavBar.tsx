@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors, Typography, Spacing, Radius } from '../constants/theme';
 
 export type NavTab = 'home' | 'transactions' | 'analytics' | 'wallets';
@@ -23,8 +24,11 @@ export const FloatingNavBar: React.FC<FloatingNavBarProps> = ({
   onTabChange,
   onFabPress,
 }) => {
+  const insets = useSafeAreaInsets();
+  const bottomOffset = Math.max(insets.bottom + 8, Platform.OS === 'ios' ? 24 : 16);
+
   return (
-    <View style={styles.wrapper} pointerEvents="box-none">
+    <View style={[styles.wrapper, { bottom: bottomOffset }]} pointerEvents="box-none">
       <View style={styles.dock}>
         {/* Tab 1: Home / Ringkasan */}
         <TouchableOpacity
