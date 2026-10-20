@@ -6,7 +6,6 @@ import {
   Modal,
   TouchableOpacity,
   ScrollView,
-  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius } from '../constants/theme';
@@ -28,14 +27,14 @@ export const ManageWalletsModal: React.FC<ManageWalletsModalProps> = ({
   onAddWalletPress,
   onEditWalletPress,
 }) => {
-  const { wallets, deleteWallet, resetAllData, isPrivacyMode } = useMoney();
+  const { wallets, deleteWallet, isPrivacyMode } = useMoney();
   const { showAlert, showConfirm } = useAlert();
 
   const handleDeleteWallet = (wallet: Wallet) => {
     if (wallets.length <= 1) {
       showAlert({
         title: 'Perhatian',
-        message: 'Minimal harus ada 1 sumber uang di aplikasi ya beb.',
+        message: 'Minimal harus ada 1 sumber dana di aplikasi.',
         type: 'warning',
       });
       return;
@@ -48,20 +47,6 @@ export const ManageWalletsModal: React.FC<ManageWalletsModalProps> = ({
       cancelText: 'Batal',
       type: 'danger',
       onConfirm: () => deleteWallet(wallet.id),
-    });
-  };
-
-  const handleResetData = () => {
-    showConfirm({
-      title: 'Reset Data Aplikasi',
-      message: 'Apakah kamu ingin mengembalikan data aplikasi ke kondisi awal contoh?',
-      confirmText: 'Reset',
-      cancelText: 'Batal',
-      type: 'danger',
-      onConfirm: async () => {
-        await resetAllData();
-        onClose();
-      },
     });
   };
 
@@ -139,16 +124,6 @@ export const ManageWalletsModal: React.FC<ManageWalletsModalProps> = ({
             >
               <Ionicons name="add-circle" size={18} color={Colors.primaryLight} />
               <Text style={styles.addNewBtnText}>Tambah Dompet / Akun Baru</Text>
-            </TouchableOpacity>
-
-            {/* Reset App Data Button */}
-            <TouchableOpacity
-              style={styles.resetBtn}
-              onPress={handleResetData}
-              activeOpacity={0.8}
-            >
-              <Ionicons name="refresh-circle-outline" size={18} color={Colors.textTertiary} />
-              <Text style={styles.resetBtnText}>Reset ke Data Awal (Demo)</Text>
             </TouchableOpacity>
           </ScrollView>
         </View>
@@ -246,18 +221,5 @@ const styles = StyleSheet.create({
     color: Colors.primaryLight,
     fontSize: Typography.sizes.sm,
     fontWeight: Typography.weights.bold,
-  },
-  resetBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: Spacing.xs,
-    paddingVertical: Spacing.md,
-    marginTop: Spacing.md,
-    opacity: 0.7,
-  },
-  resetBtnText: {
-    color: Colors.textTertiary,
-    fontSize: Typography.sizes.xs,
   },
 });

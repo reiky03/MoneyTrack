@@ -75,7 +75,7 @@ export const EditWalletModal: React.FC<EditWalletModalProps> = ({
     if (!name.trim()) {
       showAlert({
         title: 'Perhatian',
-        message: 'Nama dompet / akun tidak boleh kosong ya beb.',
+        message: 'Nama dompet / akun tidak boleh kosong.',
         type: 'warning',
       });
       return;

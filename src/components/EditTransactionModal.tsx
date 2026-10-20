@@ -144,7 +144,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
     if (numericAmount <= 0) {
       showAlert({
         title: 'Perhatian',
-        message: 'Nominal transaksi harus lebih dari 0 ya beb.',
+        message: 'Nominal transaksi harus lebih dari 0.',
         type: 'warning',
       });
       return;
@@ -153,7 +153,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
     if (!selectedWalletId) {
       showAlert({
         title: 'Perhatian',
-        message: 'Pilih sumber uang terlebih dahulu ya beb.',
+        message: 'Silakan pilih sumber dana terlebih dahulu.',
         type: 'warning',
       });
       return;

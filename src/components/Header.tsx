@@ -46,7 +46,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSettings, onOpenWallets })
     } catch {
       showAlert({
         title: 'Gagal Memeriksa',
-        message: 'Tidak dapat memeriksa pembaruan. Pastikan perangkatmu terhubung ke internet ya beb.',
+        message: 'Tidak dapat memeriksa pembaruan. Pastikan perangkat terhubung ke internet.',
         type: 'warning',
       });
     } finally {

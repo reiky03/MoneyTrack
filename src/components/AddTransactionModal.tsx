@@ -139,7 +139,7 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
     if (numericAmount <= 0) {
       showAlert({
         title: 'Perhatian',
-        message: 'Nominal transaksi harus lebih dari 0 ya beb.',
+        message: 'Nominal transaksi harus lebih dari 0.',
         type: 'warning',
       });
       return;
@@ -148,7 +148,7 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
     if (!selectedWalletId) {
       showAlert({
         title: 'Perhatian',
-        message: 'Pilih sumber uangnya dulu ya beb.',
+        message: 'Silakan pilih sumber dana terlebih dahulu.',
         type: 'warning',
       });
       return;
@@ -166,7 +166,7 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
     if (type !== 'transfer' && !selectedCategoryId) {
       showAlert({
         title: 'Perhatian',
-        message: 'Pilih kategori transaksi ya beb.',
+        message: 'Silakan pilih kategori transaksi.',
         type: 'warning',
       });
       return;

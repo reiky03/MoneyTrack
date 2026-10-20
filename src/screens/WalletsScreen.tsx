@@ -33,7 +33,7 @@ export const WalletsScreen: React.FC = () => {
     if (wallets.length <= 1) {
       showAlert({
         title: 'Perhatian',
-        message: 'Minimal harus ada 1 dompet / sumber uang aktif di aplikasi ya beb.',
+        message: 'Minimal harus ada 1 dompet / sumber uang aktif di aplikasi.',
         type: 'warning',
       });
       return;
