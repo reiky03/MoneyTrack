@@ -23,6 +23,7 @@ import {
 } from '../utils/formatters';
 import { AddCategoryModal } from './AddCategoryModal';
 import { formatDateIndonesian, toDateString } from '../utils/dateUtils';
+import { useSmoothKeyboard } from '../hooks/useSmoothKeyboard';
 
 interface EditTransactionModalProps {
   visible: boolean;
@@ -67,6 +68,8 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
 
   const [showAddCategoryModal, setShowAddCategoryModal] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  useSmoothKeyboard();
 
   // Sync state when transaction changes or modal opens
   useEffect(() => {
@@ -240,7 +243,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
       onRequestClose={onClose}
     >
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.keyboardAvoidingView}
       >
         <View style={styles.overlay}>
@@ -272,6 +275,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
           <ScrollView
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
             contentContainerStyle={styles.scroll}
           >
             {/* Type Switcher */}

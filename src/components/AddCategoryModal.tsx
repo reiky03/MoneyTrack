@@ -17,6 +17,7 @@ import { useMoney } from '../context/MoneyContext';
 import { useAlert } from '../context/AlertContext';
 import { Category } from '../types';
 import { IconPickerModal } from './IconPickerModal';
+import { useSmoothKeyboard } from '../hooks/useSmoothKeyboard';
 
 interface AddCategoryModalProps {
   visible: boolean;
@@ -33,6 +34,8 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = ({
 }) => {
   const { addCategory } = useMoney();
   const { showAlert } = useAlert();
+
+  useSmoothKeyboard();
 
   const [name, setName] = useState('');
   const [type, setType] = useState<'expense' | 'income'>(initialType);
@@ -84,7 +87,7 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = ({
       onRequestClose={onClose}
     >
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.keyboardAvoidingView}
       >
         <View style={styles.overlay}>
@@ -108,6 +111,7 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = ({
             <ScrollView
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="on-drag"
               contentContainerStyle={{ paddingBottom: Spacing.md }}
             >
             {/* Live Preview Card */}

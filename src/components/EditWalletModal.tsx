@@ -17,6 +17,7 @@ import { useMoney } from '../context/MoneyContext';
 import { useAlert } from '../context/AlertContext';
 import { Wallet, WalletType } from '../types';
 import { formatNumberWithDots, parseCurrencyInput, formatRupiah } from '../utils/formatters';
+import { useSmoothKeyboard } from '../hooks/useSmoothKeyboard';
 
 interface EditWalletModalProps {
   visible: boolean;
@@ -38,6 +39,8 @@ export const EditWalletModal: React.FC<EditWalletModalProps> = ({
 }) => {
   const { adjustWalletBalance, deleteWallet, wallets, isPrivacyMode } = useMoney();
   const { showAlert, showConfirm } = useAlert();
+
+  useSmoothKeyboard();
 
   const [name, setName] = useState('');
   const [selectedType, setSelectedType] = useState<WalletType>('bank');
@@ -132,7 +135,7 @@ export const EditWalletModal: React.FC<EditWalletModalProps> = ({
       onRequestClose={onClose}
     >
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.keyboardAvoidingView}
       >
         <View style={styles.overlay}>
@@ -164,6 +167,7 @@ export const EditWalletModal: React.FC<EditWalletModalProps> = ({
             <ScrollView
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="on-drag"
               contentContainerStyle={styles.scroll}
             >
             {/* Balance Adjustment Section (Main Highlight) */}

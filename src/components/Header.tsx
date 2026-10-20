@@ -78,7 +78,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSettings, onOpenWallets })
           {isCheckingUpdate ? (
             <ActivityIndicator size="small" color={Colors.primaryLight} style={{ transform: [{ scale: 0.75 }] }} />
           ) : (
-            <Ionicons name="sparkles" size={12} color={Colors.primaryLight} />
+            <Ionicons name="cloud-download-outline" size={13} color={Colors.primaryLight} />
           )}
           <Text style={styles.versionPillText}>{APP_VERSION}</Text>
         </TouchableOpacity>

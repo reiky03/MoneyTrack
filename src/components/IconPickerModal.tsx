@@ -14,6 +14,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius } from '../constants/theme';
 import { AVAILABLE_ICONS, ICON_CATEGORIES, IconName } from '../constants/icons';
+import { useSmoothKeyboard } from '../hooks/useSmoothKeyboard';
 
 interface IconPickerModalProps {
   visible: boolean;
@@ -30,6 +31,8 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
 }) => {
   const [selectedGroup, setSelectedGroup] = useState<string>('Semua');
   const [searchQuery, setSearchQuery] = useState<string>('');
+
+  useSmoothKeyboard();
 
   const filteredIcons = AVAILABLE_ICONS.filter((item) => {
     const matchesGroup =
@@ -49,7 +52,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
       onRequestClose={onClose}
     >
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.keyboardAvoidingView}
       >
         <View style={styles.overlay}>
@@ -136,6 +139,8 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
             style={styles.iconScroll}
             contentContainerStyle={styles.iconGrid}
             showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
           >
             {filteredIcons.map((item) => {
               const isSelected = selectedIcon === item.name;

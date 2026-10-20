@@ -17,6 +17,7 @@ import { useMoney } from '../context/MoneyContext';
 import { useAlert } from '../context/AlertContext';
 import { WalletType } from '../types';
 import { formatNumberWithDots, parseCurrencyInput } from '../utils/formatters';
+import { useSmoothKeyboard } from '../hooks/useSmoothKeyboard';
 
 interface AddWalletModalProps {
   visible: boolean;
@@ -36,6 +37,8 @@ export const AddWalletModal: React.FC<AddWalletModalProps> = ({
 }) => {
   const { addWallet } = useMoney();
   const { showAlert } = useAlert();
+
+  useSmoothKeyboard();
 
   const [name, setName] = useState('');
   const [selectedType, setSelectedType] = useState<WalletType>('bank');
@@ -98,7 +101,7 @@ export const AddWalletModal: React.FC<AddWalletModalProps> = ({
       onRequestClose={onClose}
     >
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.keyboardAvoidingView}
       >
         <View style={styles.overlay}>
@@ -122,6 +125,7 @@ export const AddWalletModal: React.FC<AddWalletModalProps> = ({
             <ScrollView
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="on-drag"
               contentContainerStyle={{ paddingBottom: Spacing.md }}
             >
             {/* Wallet Type Selection */}
