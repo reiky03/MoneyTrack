@@ -1,109 +1,169 @@
-# MoneyTrack 💳✨
+<div align="center">
 
-Aplikasi pencatat keuangan modern, minimalis, dan interaktif dengan desain kelas dunia untuk Android dan iOS, dibangun menggunakan **React Native + Expo (TypeScript)**.
+  <img src="docs/screenshots/icon.png" alt="MoneyTrack Logo" width="120" style="border-radius: 28px; box-shadow: 0 8px 32px rgba(99, 102, 241, 0.35);" />
 
----
+  # MoneyTrack 💳✨
+  
+  **Aplikasi Manajemen Finansial Pribadi & Pelacak Pengeluaran Modern dengan Desain Dark-Mode Kelas Dunia**
+  
+  [![React Native](https://img.shields.io/badge/React%20Native-0.76+-blue.svg?style=for-the-badge&logo=react)](https://reactnative.dev)
+  [![Expo SDK 52](https://img.shields.io/badge/Expo-SDK%2052-black.svg?style=for-the-badge&logo=expo)](https://expo.dev)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-5.3+-3178C6.svg?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org)
+  [![EAS Updates](https://img.shields.io/badge/OTA%20Updates-Enabled-10B981.svg?style=for-the-badge&logo=expo)](https://docs.expo.dev/eas-update/introduction/)
+  [![License MIT](https://img.shields.io/badge/License-MIT-6366F1.svg?style=for-the-badge)](LICENSE)
 
-## 🌟 Fitur Utama (MVP)
+  <br />
 
-1. **Dashboard Saldo Bersih & Multi-Account:**
-   - Menampilkan total kekayaan bersih (*Net Worth*) dalam kartu gradien gelap modern.
-   - Slider kartu dompet / sumber uang yang fleksibel: **Uang Bank (BCA)**, **Uang Kas (Dompet)**, **E-Wallet (GoPay)**, dan lainnya.
-   - Saldo tiap akun diperbarui secara otomatis secara *real-time* berdasarkan riwayat transaksi.
-   - Filter transaksi instan hanya dengan mengetuk kartu dompet tertentu.
+  <img src="docs/screenshots/banner.jpg" alt="MoneyTrack App Showcase Banner" width="100%" style="border-radius: 16px; margin: 20px 0;" />
 
-2. **Ringkasan Arus Kas & Periode Fleksibel:**
-   - Kartu Pemasukan (Hijau) vs Pengeluaran (Merah) beserta selisih (*Surplus/Defisit*).
-   - Pengatur periode cepat: **Bulan Ini**, **Bulan Lalu**, **Minggu Ini**, **Hari Ini**, **Tahun Ini**.
-   - **Pemilih Rentang Tanggal Kustom:** Bebas atur tanggal mulai hingga tanggal selesai dengan pilihan cepat (7 hari, 30 hari, dll.).
+  <p align="center">
+    <a href="https://expo.dev/artifacts/eas/t_Hk9hLB3agWNty34L_apTekRRP_1hlgZvNXkrchDsE.apk">
+      <img src="https://img.shields.io/badge/Download%20APK-v1.2.0-6366F1?style=for-the-badge&logo=android&logoColor=white" alt="Download APK" />
+    </a>
+  </p>
 
-3. **Grafik Interaktif Arus Kas:**
-   - Grafik batang visual membandingkan pemasukan dan pengeluaran per interval waktu dalam periode terpilih.
-   - Skala otomatis dinamis dengan tooltip interaktif (ketuk batang untuk melihat nominal tepatnya).
-
-4. **Analisis Kategori (Breakdown):**
-   - Rincian persentase belanja berdasarkan kategori dengan progress bar berwarna khas.
-   - Tab beralih antara analisis Pengeluaran dan Pemasukan.
-
-5. **Pencatatan Transaksi Cepat & Lengkap:**
-   - Opsi Tipe: **Pengeluaran**, **Pemasukan**, dan **Transfer Antar Akun**.
-   - Input nominal besar berformat Rupiah otomatis (`Rp 0`) dengan tombol tambah cepat (`+10rb`, `+25rb`, `+50rb`, `+100rb`, `+500rb`).
-   - Pilihan sumber uang asal (sesuai dompet yang dibuat).
-   - Pilihan kategori utama: **Pendidikan**, **Belanja**, **Rumah & Tagihan**, **Makanan & Minuman**, **Transportasi**, **Hiburan**, **Kesehatan**, dll.
-   - **Pembuat Kategori Baru:** Lengkap dengan katalog 30+ pilihan ikon terkelompok dan palet 12 warna tema modern!
-   - Catatan opsional (misal: *"Belanja telur & bumbu dapur"*, *"Kopi Kenangan"*).
-   - Pemilih waktu transaksi (Hari ini / Kemarin).
-
-6. **Privasi & Keamanan Data (Offline-First):**
-   - Mode sensor privasi (ikon mata 👁️ di header): sekali ketuk, semua angka saldo disamarkan menjadi `Rp ••••••`.
-   - Data 100% tersimpan lokal di perangkat menggunakan penyimpanan terenkripsi offline (`AsyncStorage`).
+</div>
 
 ---
 
-## 🚀 Cara Menjalankan Aplikasi
+## 📖 Tentang MoneyTrack
 
-Pastikan dependensi sudah terpasang. Jalankan perintah berikut di terminal:
+**MoneyTrack** adalah aplikasi pencatatan keuangan pribadi dan pelacak arus kas (*cash flow*) yang dirancang khusus untuk kenyamanan pengguna dengan tema gelap premium (*obsidian dark theme*). Dibangun menggunakan **React Native**, **Expo SDK 52**, dan **TypeScript**, aplikasi ini menggabungkan performa kencang dengan interaktivitas visual yang intuitif.
+
+Aplikasi ini bersifat **Offline-First**, menjaga keamanan data finansial 100% di perangkat Anda, serta dilengkapi kemampuan **Over-The-Air (OTA) Updates** sehingga setiap pembaruan fitur di masa depan terpasang otomatis tanpa perlu mengunduh ulang APK.
+
+---
+
+## 📸 Tampilan Antarmuka (Screenshots)
+
+<div align="center">
+  <table border="0" style="border: none;">
+    <tr>
+      <td align="center" width="50%">
+        <b>📊 Kartu Saldo Bersih & Arus Kas</b><br /><br />
+        <img src="docs/screenshots/dashboard.png" alt="Dashboard Card" width="90%" style="border-radius: 14px;" />
+      </td>
+      <td align="center" width="50%">
+        <b>🏷️ Analisis & Pembagian Kategori</b><br /><br />
+        <img src="docs/screenshots/categories.png" alt="Analisis Kategori" width="90%" style="border-radius: 14px;" />
+      </td>
+    </tr>
+  </table>
+</div>
+
+---
+
+## 🌟 Fitur Unggulan
+
+### 1. 💼 Multi-Dompet / Sumber Uang (Multi-Account)
+* Kelola berbagai sumber dana secara terpisah: **Rekening Bank**, **Uang Tunai / Kas**, **E-Wallet (GoPay, OVO, Dana)**, dan **Investasi**.
+* Saldo tiap akun terhitung dan ter-update secara *real-time* dari seluruh riwayat mutasi transaksi.
+* Filter transaksi per dompet hanya dengan 1 ketukan pada kartu dompet.
+
+### 2. 📈 Analisis Arus Kas & Visualisasi Interaktif
+* Ringkasan **Pemasukan** (*Income*), **Pengeluaran** (*Expense*), serta **Surplus / Defisit** per periode terpilih.
+* **Grafik Lingkaran Donat Interaktif (Interactive Donut Chart)**: Menampilkan proporsi belanja berdasarkan kategori warna-warni yang memikat.
+* Rincian persentase belanja dengan *progress bar* modern.
+
+### 3. 🗓️ Navigasi Tanggal & Bulan Fleksibel
+* **Month Navigator**: Navigasi bulan cepat (Maju/Mundur antar bulan) hanya dengan satu sentuhan.
+* Filter segmen ringkas: **Semua Transaksi**, **Pengeluaran**, dan **Pemasukan**.
+* **Filter Rentang Tanggal Kustom**: Bebas atur rentang tanggal mulai hingga tanggal akhir yang spesifik.
+
+### 4. 📝 Pencatatan Cepat & Multi-Kategori
+* Dukungan untuk: **Pengeluaran**, **Pemasukan**, dan **Transfer Antar Dompet**.
+* Format Rupiah instan (`Rp 0`) dengan tombol penambah cepat (`+10rb`, `+50rb`, `+100rb`, `+500rb`).
+* Pembuat Kategori Kustom: Dilengkapi katalog **30+ ikon Ionicons** dan **12 palet warna modern**.
+
+### 5. 🔔 Dialog Konfirmasi Kustom (Dark-Themed Alert)
+* Dialog konfirmasi hapus transaksi, hapus dompet, dan reset data dirancang khusus selaras dengan tema gelap aplikasi (bukan dialog bawaan sistem Android).
+* Dilengkapi *danger badge* berpendar dan *haptic feedback* lembut saat dialog muncul.
+
+### 6. 🛡️ Mode Privasi (Sensor Saldo)
+* Tombol sensor mata di navbar atas: Dalam satu ketukan, seluruh angka saldo dan mutasi disamarkan menjadi `Rp ••••••` untuk keamanan saat membuka aplikasi di tempat umum.
+
+### 7. 🚀 Over-The-Air (OTA) Updates
+* Menggunakan **`expo-updates`** dengan integrasi saluran *preview/production* EAS. Pembaruan kode dan desain dapat dikirim langsung ke pengguna melalui internet tanpa perlu instalasi ulang.
+
+---
+
+## 🛠️ Teknologi yang Digunakan
+
+* **Framework**: [React Native](https://reactnative.dev/)
+* **Platform & Tooling**: [Expo](https://expo.dev/) (SDK 52)
+* **Bahasa**: [TypeScript](https://www.typescriptlang.org/)
+* **Penyimpanan Lokal**: `@react-native-async-storage/async-storage`
+* **Grafik & Visual**: `react-native-svg` (Path arcs & interactive donut charts)
+* **Ikonografi**: `@expo/vector-icons` (Ionicons)
+* **Build & Updates**: [Expo Application Services (EAS)](https://expo.dev/eas) (EAS Build & EAS Update)
+* **Paket Manager / Runtime**: [Bun](https://bun.sh/) & npm
+
+---
+
+## 🚀 Memulai (Getting Started)
+
+### Prasyarat
+* [Node.js](https://nodejs.org/) (versi 18+) atau [Bun](https://bun.sh/)
+* Aplikasi [Expo Go](https://play.google.com/store/apps/details?id=host.exp.exponent) di HP Android/iOS (opsional jika ingin live preview)
+
+### Instalasi
+
+1. **Clone Repositori**:
+   ```bash
+   git clone https://github.com/reiky03/MoneyTrack.git
+   cd MoneyTrack
+   ```
+
+2. **Pasang Dependensi**:
+   ```bash
+   bun install
+   # atau
+   npm install
+   ```
+
+3. **Jalankan Development Server**:
+   ```bash
+   bun start
+   # atau
+   npx expo start
+   ```
+
+4. **Buka di Perangkat**:
+   * Scan kode QR di terminal menggunakan aplikasi **Expo Go** (Android) atau Kamera (iOS).
+   * Tekan `a` untuk membuka di Android Emulator.
+   * Tekan `w` untuk membuka di Web Browser.
+
+---
+
+## 🧪 Pengujian (Testing)
+
+Proyek ini dilengkapi dengan unit test lengkap (19 uji skenario) yang mencakup logika saldo dompet, filtering transaksi, pemformatan Rupiah, dan kalkulasi tanggal:
 
 ```bash
-# Menjalankan development server
-bun start
-# atau
-npx expo start
-```
-
-### Opsi Preview di HP Android:
-1. Pasang aplikasi **Expo Go** dari Google Play Store di HP Android kamu.
-2. Scan kode **QR** yang muncul di terminal menggunakan Expo Go atau kamera HP.
-3. Aplikasi akan langsung terbuka di HP secara *live reload*!
-
-### Opsi Preview di Emulator Android:
-```bash
-bun run android
-# atau
-npx expo start --android
-```
-
-### Opsi Menjalankan Unit Testing:
-```bash
+# Menjalankan seluruh test suite
 bun test
-```
 
-### Opsi Cek Ketepatan Tipe (TypeScript):
-```bash
+# Pengecekan tipe data (TypeScript)
 npx tsc --noEmit
 ```
 
 ---
 
-## 📁 Struktur Kode
+## 📦 Mengunduh Aplikasi (Android APK)
 
-```
-AppMoneyTrack/
-├── src/
-│   ├── types/               # TypeScript interfaces & types (Wallet, Category, Transaction)
-│   ├── constants/           # Palet tema dark fintech, katalog ikon, default data
-│   ├── utils/               # Format mata uang rupiah, dateUtils, perhitungan kas & saldo
-│   │   └── __tests__/       # Unit tests (calculations, formatters, dateUtils)
-│   ├── services/            # StorageService (AsyncStorage persistence & seed data)
-│   ├── context/             # MoneyContext (State management & haptic feedback)
-│   ├── components/          # Komponen UI modern & modular
-│   │   ├── Header.tsx
-│   │   ├── TotalBalanceCard.tsx
-│   │   ├── WalletSlider.tsx
-│   │   ├── PeriodFilterBar.tsx
-│   │   ├── CashflowChart.tsx
-│   │   ├── CategoryBreakdown.tsx
-│   │   ├── TransactionList.tsx
-│   │   ├── TransactionItem.tsx
-│   │   ├── AddTransactionModal.tsx
-│   │   ├── AddWalletModal.tsx
-│   │   ├── AddCategoryModal.tsx
-│   │   ├── CustomDateRangeModal.tsx
-│   │   ├── ManageWalletsModal.tsx
-│   │   └── IconPickerModal.tsx
-│   └── screens/
-│       └── DashboardScreen.tsx
-├── App.tsx                  # Root wrapper (SafeAreaProvider, MoneyProvider)
-├── app.json                 # Expo config & Android branding
-└── package.json
-```
+Anda dapat langsung mengunduh dan memasang file APK MoneyTrack di perangkat Android Anda:
+
+* 📥 **Versi Terbaru**: [MoneyTrack v1.2.0 APK (79 MB)](https://expo.dev/artifacts/eas/t_Hk9hLB3agWNty34L_apTekRRP_1hlgZvNXkrchDsE.apk)
+* 📋 **Detail Build EAS**: [EAS Build Dashboard](https://expo.dev/accounts/siddiq03/projects/moneytrack/builds/f3fe01c5-a708-40d7-82a1-f2c588b32a0f)
+
+---
+
+## 👨‍💻 Kontributor
+
+Dibuat dengan ❤️ oleh **[Reiky Aryanando Pratama](https://github.com/reiky03)**.
+
+---
+
+## 📄 Lisensi
+
+Proyek ini dilisensikan di bawah lisensi [MIT](LICENSE).
