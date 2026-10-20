@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import {
   View,
   Text,
+  Image,
   StyleSheet,
   Animated,
   Dimensions,
@@ -9,7 +10,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors, Typography, Spacing, Radius } from '../constants/theme';
+import { Colors, Typography, Spacing, Radius, APP_VERSION } from '../constants/theme';
 
 interface SplashScreenProps {
   onFinish: () => void;
@@ -103,14 +104,11 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
             { transform: [{ scale: pulseAnim }] },
           ]}
         >
-          <LinearGradient
-            colors={['#6366F1', '#4F46E5', '#3B82F6']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.logoGradient}
-          >
-            <Ionicons name="sparkles" size={44} color="#FFFFFF" />
-          </LinearGradient>
+          <Image
+            source={require('../../assets/icon.png')}
+            style={styles.logoImage}
+            resizeMode="cover"
+          />
         </Animated.View>
 
         {/* Brand Name */}
@@ -140,7 +138,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
 
       {/* Footer */}
       <View style={styles.footer}>
-        <Text style={styles.footerVersion}>v1.0.0 • Personal Edition</Text>
+        <Text style={styles.footerVersion}>{APP_VERSION} • Personal Edition</Text>
       </View>
     </TouchableOpacity>
   );
@@ -176,23 +174,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.xl,
   },
   logoContainer: {
-    width: 96,
-    height: 96,
-    borderRadius: 32,
+    width: 100,
+    height: 100,
+    borderRadius: 24,
     shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.5,
     shadowRadius: 20,
     elevation: 12,
     marginBottom: Spacing.xl,
+    overflow: 'hidden',
+    borderWidth: 1.5,
+    borderColor: 'rgba(99, 102, 241, 0.4)',
   },
-  logoGradient: {
-    flex: 1,
-    borderRadius: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.25)',
+  logoImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 24,
   },
   title: {
     fontSize: Typography.sizes.hero,

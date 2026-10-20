@@ -90,3 +90,6 @@ export const Radius = {
   xxl: 28,
   full: 9999,
 };
+
+export const APP_VERSION = 'v1.2.0';
+

@@ -82,8 +82,15 @@ Aplikasi ini bersifat **Offline-First**, menjaga keamanan data finansial 100% di
 ### 6. 🛡️ Mode Privasi (Sensor Saldo)
 * Tombol sensor mata di navbar atas: Dalam satu ketukan, seluruh angka saldo dan mutasi disamarkan menjadi `Rp ••••••` untuk keamanan saat membuka aplikasi di tempat umum.
 
-### 7. 🚀 Over-The-Air (OTA) Updates
-* Menggunakan **`expo-updates`** dengan integrasi saluran *preview/production* EAS. Pembaruan kode dan desain dapat dikirim langsung ke pengguna melalui internet tanpa perlu instalasi ulang.
+### 7. 🚀 In-App OTA Update & Navbar Quick-Check
+* **Pill Versi & Cek Pembaruan di Navbar Atas**: Tersemat anggun di samping tombol privasi dengan status versi aktif (`v1.2.0`). Cukup 1 ketukan untuk memeriksa ketersediaan pembaruan via internet.
+* **Modal Pembaruan Interaktif**: Jika pembaruan tersedia, muncul pop-up kustom bertema *dark fintech* yang memberikan kendali penuh pada pengguna: langsung unduh (*Perbarui Sekarang*) atau tunda (*Nanti Saja*).
+
+### 8. ⌨️ Keyboard Auto-Lift & Input Ergonomis
+* Seluruh formulir input (Tambah & Edit Transaksi, Tambah & Edit Dompet, Kategori) dilengkapi `KeyboardAvoidingView` cerdas yang otomatis mengangkat bidang input saat keyboard smartphone muncul, dan kembali ke posisi semula saat keyboard ditutup.
+
+### 9. 🌌 Native Dark Splash Screen
+* Transisi peluncuran aplikasi tanpa kedipan putih (*zero white flash*). Menggunakan latar belakang *solid obsidian* (`#080C16`) dan ikon 3D mewah beresolusi tinggi sejak detik pertama aplikasi dibuka.
 
 ---
 
@@ -155,6 +162,17 @@ Anda dapat langsung mengunduh dan memasang file APK MoneyTrack di perangkat Andr
 
 * 📥 **Versi Terbaru**: [MoneyTrack v1.2.0 APK (79 MB)](https://expo.dev/artifacts/eas/t_Hk9hLB3agWNty34L_apTekRRP_1hlgZvNXkrchDsE.apk)
 * 📋 **Detail Build EAS**: [EAS Build Dashboard](https://expo.dev/accounts/siddiq03/projects/moneytrack/builds/f3fe01c5-a708-40d7-82a1-f2c588b32a0f)
+
+---
+
+## 📋 Catatan Rilis (Changelog)
+
+### v1.2.0 (Pembaruan Terkini)
+* ✨ **Pill Versi & Cek Pembaruan Navbar**: Tombol cek OTA update dan indikator versi dipindahkan ke navbar atas layar utama dengan desain ramping.
+* 🚀 **In-App Update Prompt Modal**: Pop-up konfirmasi pembaruan interaktif dengan opsi *Perbarui Sekarang* atau *Nanti Saja*.
+* ⌨️ **Keyboard Auto-Lift**: Formulir input otomatis bergeser ke atas saat keyboard aktif agar tidak menutupi bidang ketikan.
+* 🌌 **Native Dark Splash Screen**: Eliminasi kedipan putih saat aplikasi diluncurkan dengan latar `#080C16` dan ikon 3D terintegrasi.
+* 💼 **Tampilan Dompet Ramping**: Menghapus kartu pembaruan dari menu dompet agar fokus 100% pada manajemen rekening.
 
 ---
 

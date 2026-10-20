@@ -1,9 +1,12 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import * as Updates from 'expo-updates';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors, Typography, Spacing, Radius } from '../constants/theme';
+import { Colors, Typography, Spacing, Radius, APP_VERSION } from '../constants/theme';
 import { useMoney } from '../context/MoneyContext';
+import { useAlert } from '../context/AlertContext';
 import { formatDateIndonesian } from '../utils/dateUtils';
+import { UpdatePromptModal } from './UpdatePromptModal';
 
 interface HeaderProps {
   onOpenSettings?: () => void;
@@ -12,7 +15,44 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onOpenSettings, onOpenWallets }) => {
   const { isPrivacyMode, togglePrivacyMode } = useMoney();
+  const { showAlert } = useAlert();
+  const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
+  const [manualCheckTrigger, setManualCheckTrigger] = useState(0);
+
   const todayStr = formatDateIndonesian(new Date(), { showDay: true, shortMonth: true });
+
+  const handleCheckUpdate = async () => {
+    if (!Updates.isEnabled) {
+      showAlert({
+        title: `MoneyTrack ${APP_VERSION} 🎉`,
+        message: 'Aplikasi kamu saat ini sudah menggunakan versi paling mutakhir (v1.2.0).',
+        type: 'info',
+      });
+      return;
+    }
+
+    try {
+      setIsCheckingUpdate(true);
+      const check = await Updates.checkForUpdateAsync();
+      if (check.isAvailable) {
+        setManualCheckTrigger((c) => c + 1);
+      } else {
+        showAlert({
+          title: 'Versi Terkini 🎉',
+          message: `Aplikasi kamu sudah menggunakan pembaruan terbaru (${APP_VERSION}). Belum ada update baru.`,
+          type: 'info',
+        });
+      }
+    } catch {
+      showAlert({
+        title: 'Gagal Memeriksa',
+        message: 'Tidak dapat memeriksa pembaruan. Pastikan perangkatmu terhubung ke internet ya beb.',
+        type: 'warning',
+      });
+    } finally {
+      setIsCheckingUpdate(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -27,6 +67,22 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSettings, onOpenWallets })
       </View>
 
       <View style={styles.rightSection}>
+        {/* App Version & OTA Update Check Badge */}
+        <TouchableOpacity
+          style={styles.versionPill}
+          onPress={handleCheckUpdate}
+          disabled={isCheckingUpdate}
+          activeOpacity={0.7}
+          accessibilityLabel={`Versi aplikasi ${APP_VERSION}. Ketuk untuk memeriksa pembaruan.`}
+        >
+          {isCheckingUpdate ? (
+            <ActivityIndicator size="small" color={Colors.primaryLight} style={{ transform: [{ scale: 0.75 }] }} />
+          ) : (
+            <Ionicons name="sparkles" size={12} color={Colors.primaryLight} />
+          )}
+          <Text style={styles.versionPillText}>{APP_VERSION}</Text>
+        </TouchableOpacity>
+
         {/* Privacy Toggle Button */}
         <TouchableOpacity
           style={[styles.iconButton, isPrivacyMode && styles.iconButtonActive]}
@@ -36,7 +92,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSettings, onOpenWallets })
         >
           <Ionicons
             name={isPrivacyMode ? 'eye-off' : 'eye'}
-            size={19}
+            size={18}
             color={isPrivacyMode ? Colors.primaryLight : Colors.textSecondary}
           />
         </TouchableOpacity>
@@ -49,10 +105,13 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSettings, onOpenWallets })
             activeOpacity={0.7}
             accessibilityLabel="Kelola Dompet & Akun"
           >
-            <Ionicons name="wallet-outline" size={19} color={Colors.textSecondary} />
+            <Ionicons name="wallet-outline" size={18} color={Colors.textSecondary} />
           </TouchableOpacity>
         )}
       </View>
+
+      {/* Manual Check Update Modal */}
+      <UpdatePromptModal manualCheckTrigger={manualCheckTrigger} />
     </View>
   );
 };
@@ -104,9 +163,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.sm,
   },
+  versionPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    height: 36,
+    paddingHorizontal: 10,
+    borderRadius: Radius.full,
+    backgroundColor: 'rgba(99, 102, 241, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(99, 102, 241, 0.3)',
+  },
+  versionPillText: {
+    fontSize: 11,
+    fontWeight: Typography.weights.bold,
+    color: Colors.primaryLight,
+    letterSpacing: 0.3,
+  },
   iconButton: {
-    width: 40,
-    height: 40,
+    width: 36,
+    height: 36,
     borderRadius: Radius.md,
     backgroundColor: Colors.surface,
     borderWidth: 1,
