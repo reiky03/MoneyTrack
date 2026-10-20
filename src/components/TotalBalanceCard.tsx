@@ -19,9 +19,6 @@ export const TotalBalanceCard: React.FC = () => {
         end={{ x: 1, y: 1 }}
         style={styles.card}
       >
-        {/* Top Glow Accent Bar */}
-        <View style={styles.accentGlow} />
-
         <View style={styles.topRow}>
           <Text style={styles.label}>TOTAL SALDO BERSIH</Text>
           <View style={styles.statusPill}>
@@ -118,19 +115,6 @@ const styles = StyleSheet.create({
     shadowRadius: 16,
     elevation: 8,
     overflow: 'hidden',
-    position: 'relative',
-  },
-  accentGlow: {
-    position: 'absolute',
-    top: 0,
-    left: '25%',
-    right: '25%',
-    height: 2,
-    backgroundColor: Colors.primary,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1,
-    shadowRadius: 6,
   },
   topRow: {
     flexDirection: 'row',
