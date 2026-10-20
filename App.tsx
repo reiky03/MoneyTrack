@@ -5,6 +5,7 @@ import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-cont
 import { useFonts } from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
 import { MoneyProvider } from './src/context/MoneyContext';
+import { AlertProvider } from './src/context/AlertContext';
 import { DashboardScreen } from './src/screens/DashboardScreen';
 import { TransactionsScreen } from './src/screens/TransactionsScreen';
 import { AnalyticsScreen } from './src/screens/AnalyticsScreen';
@@ -75,13 +76,15 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <MoneyProvider>
-        <StatusBar style="light" />
+        <AlertProvider>
+          <StatusBar style="light" />
 
-        {!isReady ? (
-          <SplashScreen onFinish={() => setShowSplash(false)} />
-        ) : (
-          <MainApp />
-        )}
+          {!isReady ? (
+            <SplashScreen onFinish={() => setShowSplash(false)} />
+          ) : (
+            <MainApp />
+          )}
+        </AlertProvider>
       </MoneyProvider>
     </SafeAreaProvider>
   );

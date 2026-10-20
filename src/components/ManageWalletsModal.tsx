@@ -11,6 +11,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius } from '../constants/theme';
 import { useMoney } from '../context/MoneyContext';
+import { useAlert } from '../context/AlertContext';
 import { Wallet } from '../types';
 import { formatRupiah } from '../utils/formatters';
 
@@ -28,43 +29,40 @@ export const ManageWalletsModal: React.FC<ManageWalletsModalProps> = ({
   onEditWalletPress,
 }) => {
   const { wallets, deleteWallet, resetAllData, isPrivacyMode } = useMoney();
+  const { showAlert, showConfirm } = useAlert();
 
   const handleDeleteWallet = (wallet: Wallet) => {
     if (wallets.length <= 1) {
-      Alert.alert('Perhatian', 'Minimal harus ada 1 sumber uang di aplikasi.');
+      showAlert({
+        title: 'Perhatian',
+        message: 'Minimal harus ada 1 sumber uang di aplikasi ya beb.',
+        type: 'warning',
+      });
       return;
     }
 
-    Alert.alert(
-      'Hapus Sumber Uang',
-      `Yakin ingin menghapus ${wallet.name}? Transaksi yang berkaitan tidak akan dihapus.`,
-      [
-        { text: 'Batal', style: 'cancel' },
-        {
-          text: 'Hapus',
-          style: 'destructive',
-          onPress: () => deleteWallet(wallet.id),
-        },
-      ]
-    );
+    showConfirm({
+      title: 'Hapus Sumber Uang',
+      message: `Yakin ingin menghapus ${wallet.name}? Transaksi yang berkaitan tidak akan terhapus.`,
+      confirmText: 'Hapus',
+      cancelText: 'Batal',
+      type: 'danger',
+      onConfirm: () => deleteWallet(wallet.id),
+    });
   };
 
   const handleResetData = () => {
-    Alert.alert(
-      'Reset Data Aplikasi',
-      'Apakah kamu ingin mengembalikan data aplikasi ke kondisi awal contoh?',
-      [
-        { text: 'Batal', style: 'cancel' },
-        {
-          text: 'Reset',
-          style: 'destructive',
-          onPress: async () => {
-            await resetAllData();
-            onClose();
-          },
-        },
-      ]
-    );
+    showConfirm({
+      title: 'Reset Data Aplikasi',
+      message: 'Apakah kamu ingin mengembalikan data aplikasi ke kondisi awal contoh?',
+      confirmText: 'Reset',
+      cancelText: 'Batal',
+      type: 'danger',
+      onConfirm: async () => {
+        await resetAllData();
+        onClose();
+      },
+    });
   };
 
   return (

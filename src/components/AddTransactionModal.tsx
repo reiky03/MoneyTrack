@@ -12,6 +12,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius } from '../constants/theme';
 import { useMoney } from '../context/MoneyContext';
+import { useAlert } from '../context/AlertContext';
 import { TransactionType, Category } from '../types';
 import {
   formatNumberWithDots,
@@ -46,6 +47,8 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
     addTransaction,
     isPrivacyMode,
   } = useMoney();
+
+  const { showAlert } = useAlert();
 
   const [type, setType] = useState<TransactionType>(initialType);
   const [amountText, setAmountText] = useState<string>('');
@@ -129,22 +132,38 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
     const numericAmount = parseCurrencyInput(amountText);
 
     if (numericAmount <= 0) {
-      Alert.alert('Perhatian', 'Nominal transaksi harus lebih dari 0 ya beb');
+      showAlert({
+        title: 'Perhatian',
+        message: 'Nominal transaksi harus lebih dari 0 ya beb.',
+        type: 'warning',
+      });
       return;
     }
 
     if (!selectedWalletId) {
-      Alert.alert('Perhatian', 'Pilih sumber uangnya dulu ya beb');
+      showAlert({
+        title: 'Perhatian',
+        message: 'Pilih sumber uangnya dulu ya beb.',
+        type: 'warning',
+      });
       return;
     }
 
     if (type === 'transfer' && (!targetWalletId || targetWalletId === selectedWalletId)) {
-      Alert.alert('Perhatian', 'Pilih dompet tujuan yang berbeda untuk transfer.');
+      showAlert({
+        title: 'Perhatian',
+        message: 'Pilih dompet tujuan yang berbeda untuk transfer antar-dompet.',
+        type: 'warning',
+      });
       return;
     }
 
     if (type !== 'transfer' && !selectedCategoryId) {
-      Alert.alert('Perhatian', 'Pilih kategori transaksi ya beb');
+      showAlert({
+        title: 'Perhatian',
+        message: 'Pilih kategori transaksi ya beb.',
+        type: 'warning',
+      });
       return;
     }
 
@@ -174,7 +193,11 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
 
       onClose();
     } catch {
-      Alert.alert('Gagal', 'Terjadi kesalahan saat menyimpan transaksi.');
+      showAlert({
+        title: 'Gagal',
+        message: 'Terjadi kesalahan saat menyimpan transaksi.',
+        type: 'danger',
+      });
     } finally {
       setIsSubmitting(false);
     }

@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius } from '../constants/theme';
 import { useMoney } from '../context/MoneyContext';
+import { useAlert } from '../context/AlertContext';
 import { Transaction } from '../types';
 import { formatRupiah } from '../utils/formatters';
 import { formatDateIndonesian } from '../utils/dateUtils';
@@ -47,21 +48,19 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
     ? `Transfer ke ${targetWallet?.name || 'Akun'}`
     : category?.name || 'Lainnya';
 
+  const { showConfirm } = useAlert();
+
   const handleDelete = () => {
-    Alert.alert(
-      'Hapus Transaksi',
-      `Yakin ingin menghapus transaksi ${title} senilai ${formatRupiah(
+    showConfirm({
+      title: 'Hapus Transaksi',
+      message: `Yakin ingin menghapus transaksi ${title} sebesar ${formatRupiah(
         transaction.amount
-      )}?`,
-      [
-        { text: 'Batal', style: 'cancel' },
-        {
-          text: 'Hapus',
-          style: 'destructive',
-          onPress: () => deleteTransaction(transaction.id),
-        },
-      ]
-    );
+      )}? Saldo dompet akan otomatis disesuaikan.`,
+      confirmText: 'Hapus',
+      cancelText: 'Batal',
+      type: 'danger',
+      onConfirm: () => deleteTransaction(transaction.id),
+    });
   };
 
   const handleItemPress = () => {

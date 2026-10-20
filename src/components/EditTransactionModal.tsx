@@ -12,6 +12,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius } from '../constants/theme';
 import { useMoney } from '../context/MoneyContext';
+import { useAlert } from '../context/AlertContext';
 import { Transaction, TransactionType, Category } from '../types';
 import {
   formatNumberWithDots,
@@ -47,6 +48,8 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
     deleteTransaction,
     isPrivacyMode,
   } = useMoney();
+
+  const { showAlert, showConfirm } = useAlert();
 
   const [type, setType] = useState<TransactionType>('expense');
   const [amountText, setAmountText] = useState<string>('');
@@ -134,22 +137,38 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
     const numericAmount = parseCurrencyInput(amountText);
 
     if (numericAmount <= 0) {
-      Alert.alert('Perhatian', 'Nominal transaksi harus lebih dari 0.');
+      showAlert({
+        title: 'Perhatian',
+        message: 'Nominal transaksi harus lebih dari 0 ya beb.',
+        type: 'warning',
+      });
       return;
     }
 
     if (!selectedWalletId) {
-      Alert.alert('Perhatian', 'Pilih sumber uang terlebih dahulu.');
+      showAlert({
+        title: 'Perhatian',
+        message: 'Pilih sumber uang terlebih dahulu ya beb.',
+        type: 'warning',
+      });
       return;
     }
 
     if (type === 'transfer' && (!targetWalletId || targetWalletId === selectedWalletId)) {
-      Alert.alert('Perhatian', 'Pilih dompet tujuan yang berbeda untuk transfer.');
+      showAlert({
+        title: 'Perhatian',
+        message: 'Pilih dompet tujuan yang berbeda untuk transfer antar-dompet.',
+        type: 'warning',
+      });
       return;
     }
 
     if (type !== 'transfer' && !selectedCategoryId) {
-      Alert.alert('Perhatian', 'Pilih kategori transaksi.');
+      showAlert({
+        title: 'Perhatian',
+        message: 'Pilih kategori transaksi terlebih dahulu.',
+        type: 'warning',
+      });
       return;
     }
 
@@ -183,28 +202,28 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
       await updateTransaction(updatedTx);
       onClose();
     } catch {
-      Alert.alert('Gagal', 'Terjadi kesalahan saat memperbarui transaksi.');
+      showAlert({
+        title: 'Gagal',
+        message: 'Terjadi kesalahan saat memperbarui transaksi.',
+        type: 'danger',
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleDelete = () => {
-    Alert.alert(
-      'Hapus Transaksi',
-      `Yakin ingin menghapus transaksi senilai ${formatRupiah(transaction.amount)}?`,
-      [
-        { text: 'Batal', style: 'cancel' },
-        {
-          text: 'Hapus',
-          style: 'destructive',
-          onPress: async () => {
-            await deleteTransaction(transaction.id);
-            onClose();
-          },
-        },
-      ]
-    );
+    showConfirm({
+      title: 'Hapus Transaksi',
+      message: `Yakin ingin menghapus transaksi senilai ${formatRupiah(transaction.amount)}? Saldo dompet akan disesuaikan otomatis.`,
+      confirmText: 'Hapus',
+      cancelText: 'Batal',
+      type: 'danger',
+      onConfirm: async () => {
+        await deleteTransaction(transaction.id);
+        onClose();
+      },
+    });
   };
 
   const availableCategories = categories.filter((c) =>

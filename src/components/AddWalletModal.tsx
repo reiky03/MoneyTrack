@@ -7,11 +7,11 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius } from '../constants/theme';
 import { useMoney } from '../context/MoneyContext';
+import { useAlert } from '../context/AlertContext';
 import { WalletType } from '../types';
 import { formatNumberWithDots, parseCurrencyInput } from '../utils/formatters';
 
@@ -32,6 +32,7 @@ export const AddWalletModal: React.FC<AddWalletModalProps> = ({
   onClose,
 }) => {
   const { addWallet } = useMoney();
+  const { showAlert } = useAlert();
 
   const [name, setName] = useState('');
   const [selectedType, setSelectedType] = useState<WalletType>('bank');
@@ -52,7 +53,11 @@ export const AddWalletModal: React.FC<AddWalletModalProps> = ({
 
   const handleSave = async () => {
     if (!name.trim()) {
-      Alert.alert('Perhatian', 'Nama dompet / akun wajib diisi.');
+      showAlert({
+        title: 'Perhatian',
+        message: 'Nama dompet / akun wajib diisi ya.',
+        type: 'warning',
+      });
       return;
     }
 
@@ -72,7 +77,11 @@ export const AddWalletModal: React.FC<AddWalletModalProps> = ({
       setInitialBalanceText('');
       onClose();
     } catch {
-      Alert.alert('Gagal', 'Terjadi kesalahan saat menambah akun.');
+      showAlert({
+        title: 'Gagal',
+        message: 'Terjadi kesalahan saat menambah akun.',
+        type: 'danger',
+      });
     } finally {
       setIsSubmitting(false);
     }

@@ -10,6 +10,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius } from '../constants/theme';
 import { useMoney } from '../context/MoneyContext';
+import { useAlert } from '../context/AlertContext';
 import { Wallet } from '../types';
 import { formatRupiah } from '../utils/formatters';
 import { AddWalletModal } from '../components/AddWalletModal';
@@ -27,40 +28,37 @@ export const WalletsScreen: React.FC = () => {
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingWallet, setEditingWallet] = useState<Wallet | null>(null);
+  const { showAlert, showConfirm } = useAlert();
 
   const handleDelete = (wallet: Wallet) => {
     if (wallets.length <= 1) {
-      Alert.alert('Perhatian', 'Minimal harus ada 1 dompet / sumber uang aktif.');
+      showAlert({
+        title: 'Perhatian',
+        message: 'Minimal harus ada 1 dompet / sumber uang aktif di aplikasi ya beb.',
+        type: 'warning',
+      });
       return;
     }
 
-    Alert.alert(
-      'Hapus Dompet',
-      `Yakin ingin menghapus ${wallet.name}?`,
-      [
-        { text: 'Batal', style: 'cancel' },
-        {
-          text: 'Hapus',
-          style: 'destructive',
-          onPress: () => deleteWallet(wallet.id),
-        },
-      ]
-    );
+    showConfirm({
+      title: 'Hapus Dompet',
+      message: `Yakin ingin menghapus ${wallet.name}? Transaksi yang terkait tidak akan terhapus namun sumber dananya akan kosong.`,
+      confirmText: 'Hapus Dompet',
+      cancelText: 'Batal',
+      type: 'danger',
+      onConfirm: () => deleteWallet(wallet.id),
+    });
   };
 
   const handleClearTransactions = () => {
-    Alert.alert(
-      'Kosongkan Transaksi',
-      'Yakin ingin menghapus seluruh riwayat transaksi untuk mulai mencatat keuangan asli?',
-      [
-        { text: 'Batal', style: 'cancel' },
-        {
-          text: 'Kosongkan',
-          style: 'destructive',
-          onPress: () => clearAllTransactions(),
-        },
-      ]
-    );
+    showConfirm({
+      title: 'Kosongkan Transaksi',
+      message: 'Yakin ingin menghapus seluruh riwayat transaksi untuk mulai mencatat keuangan asli? Saldo dompet akan kembali ke nilai awal.',
+      confirmText: 'Kosongkan',
+      cancelText: 'Batal',
+      type: 'danger',
+      onConfirm: () => clearAllTransactions(),
+    });
   };
 
   return (

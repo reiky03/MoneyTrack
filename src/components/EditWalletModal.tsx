@@ -12,6 +12,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius } from '../constants/theme';
 import { useMoney } from '../context/MoneyContext';
+import { useAlert } from '../context/AlertContext';
 import { Wallet, WalletType } from '../types';
 import { formatNumberWithDots, parseCurrencyInput, formatRupiah } from '../utils/formatters';
 
@@ -34,6 +35,7 @@ export const EditWalletModal: React.FC<EditWalletModalProps> = ({
   onClose,
 }) => {
   const { adjustWalletBalance, deleteWallet, wallets, isPrivacyMode } = useMoney();
+  const { showAlert, showConfirm } = useAlert();
 
   const [name, setName] = useState('');
   const [selectedType, setSelectedType] = useState<WalletType>('bank');
@@ -66,7 +68,11 @@ export const EditWalletModal: React.FC<EditWalletModalProps> = ({
 
   const handleSave = async () => {
     if (!name.trim()) {
-      Alert.alert('Perhatian', 'Nama dompet / akun tidak boleh kosong.');
+      showAlert({
+        title: 'Perhatian',
+        message: 'Nama dompet / akun tidak boleh kosong ya beb.',
+        type: 'warning',
+      });
       return;
     }
 
@@ -83,7 +89,11 @@ export const EditWalletModal: React.FC<EditWalletModalProps> = ({
 
       onClose();
     } catch {
-      Alert.alert('Gagal', 'Terjadi kesalahan saat menyimpan perubahan dompet.');
+      showAlert({
+        title: 'Gagal',
+        message: 'Terjadi kesalahan saat menyimpan perubahan dompet.',
+        type: 'danger',
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -91,25 +101,25 @@ export const EditWalletModal: React.FC<EditWalletModalProps> = ({
 
   const handleDelete = () => {
     if (wallets.length <= 1) {
-      Alert.alert('Perhatian', 'Minimal harus ada 1 dompet / sumber uang aktif.');
+      showAlert({
+        title: 'Perhatian',
+        message: 'Minimal harus ada 1 dompet / sumber uang aktif di aplikasi.',
+        type: 'warning',
+      });
       return;
     }
 
-    Alert.alert(
-      'Hapus Dompet',
-      `Yakin ingin menghapus ${wallet.name}?`,
-      [
-        { text: 'Batal', style: 'cancel' },
-        {
-          text: 'Hapus',
-          style: 'destructive',
-          onPress: async () => {
-            await deleteWallet(wallet.id);
-            onClose();
-          },
-        },
-      ]
-    );
+    showConfirm({
+      title: 'Hapus Dompet',
+      message: `Yakin ingin menghapus ${wallet.name}? Transaksi yang ada tidak akan terhapus.`,
+      confirmText: 'Hapus',
+      cancelText: 'Batal',
+      type: 'danger',
+      onConfirm: async () => {
+        await deleteWallet(wallet.id);
+        onClose();
+      },
+    });
   };
 
   return (
