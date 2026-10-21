@@ -4,7 +4,7 @@
 
   # MoneyTrack 💳✨
   
-  **Aplikasi Manajemen Finansial Pribadi & Pelacak Pengeluaran Modern dengan Desain Dark-Mode Kelas Dunia**
+  **Aplikasi pencatat keuangan dan pengeluaran harian berbasis React Native & Expo**
   
   [![React Native](https://img.shields.io/badge/React%20Native-0.76+-blue.svg?style=for-the-badge&logo=react)](https://reactnative.dev)
   [![Expo SDK 52](https://img.shields.io/badge/Expo-SDK%2052-black.svg?style=for-the-badge&logo=expo)](https://expo.dev)
@@ -28,9 +28,9 @@
 
 ## 📖 Tentang MoneyTrack
 
-**MoneyTrack** adalah aplikasi pencatatan keuangan pribadi dan pelacak arus kas (*cash flow*) yang dirancang khusus untuk kenyamanan pengguna dengan tema gelap premium (*obsidian dark theme*). Dibangun menggunakan **React Native**, **Expo SDK 52**, dan **TypeScript**, aplikasi ini menggabungkan performa kencang dengan interaktivitas visual yang intuitif.
+**MoneyTrack** adalah aplikasi mobile untuk mencatat keuangan dan pengeluaran harian secara praktis dan rapi. Dibuat menggunakan **React Native**, **Expo**, dan **TypeScript**, aplikasi ini bekerja secara **offline** sehingga seluruh data tersimpan langsung di perangkat pengguna secara aman.
 
-Aplikasi ini bersifat **Offline-First**, menjaga keamanan data finansial 100% di perangkat Anda, serta dilengkapi kemampuan **Over-The-Air (OTA) Updates** sehingga setiap pembaruan fitur di masa depan terpasang otomatis tanpa perlu mengunduh ulang APK.
+Dilengkapi dengan sistem **Over-The-Air (OTA) Updates** via EAS, sehingga perbaikan dan pembaruan aplikasi dapat diterima langsung oleh pengguna tanpa perlu mengunduh ulang file APK.
 
 ---
 
@@ -176,9 +176,9 @@ Anda dapat langsung mengunduh dan memasang file APK MoneyTrack di perangkat Andr
 
 ---
 
-## 👨‍💻 Kontributor
+## 👨‍💻 Author
 
-Dibuat dengan ❤️ oleh **[Reiky Aryanando Pratama](https://github.com/reiky03)**.
+**[Reiky Aryanando Pratama](https://github.com/reiky03)**
 
 ---
 
