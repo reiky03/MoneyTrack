@@ -168,6 +168,7 @@ Anda dapat langsung mengunduh dan memasang file APK MoneyTrack di perangkat Andr
 ## 📋 Catatan Rilis (Changelog)
 
 ### v1.2.0 (Pembaruan Terkini)
+* 📅 **Pengelompokan Transaksi Berdasarkan Tanggal**: Riwayat transaksi kini tersusun rapi per hari dengan penanda tanggal jelas (*cth: Senin, 12 Oktober 2026*) dan jumlah transaksi harian.
 * ✨ **Pill Versi & Cek Pembaruan Navbar**: Tombol cek OTA update dan indikator versi dipindahkan ke navbar atas layar utama dengan desain ramping.
 * 🚀 **In-App Update Prompt Modal**: Pop-up konfirmasi pembaruan interaktif dengan opsi *Perbarui Sekarang* atau *Nanti Saja*.
 * ⌨️ **Keyboard Auto-Lift**: Formulir input otomatis bergeser ke atas saat keyboard aktif agar tidak menutupi bidang ketikan.

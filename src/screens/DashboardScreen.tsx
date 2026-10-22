@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   StyleSheet,
@@ -22,6 +22,7 @@ import { AddWalletModal } from '../components/AddWalletModal';
 import { EditWalletModal } from '../components/EditWalletModal';
 import { ManageWalletsModal } from '../components/ManageWalletsModal';
 import { Transaction, Wallet } from '../types';
+import { groupTransactionsByDate } from '../utils/dateUtils';
 
 interface DashboardScreenProps {
   onNavigateToTransactions?: () => void;
@@ -56,8 +57,14 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
     );
   }
 
-  // Show recent 5 transactions on the home dashboard
-  const recentTransactions = filteredTransactions.slice(0, 5);
+  // Show recent 5 transactions on the home dashboard grouped by date
+  const recentTransactions = useMemo(() => {
+    return filteredTransactions.slice(0, 5);
+  }, [filteredTransactions]);
+
+  const recentDateGroups = useMemo(() => {
+    return groupTransactionsByDate(recentTransactions);
+  }, [recentTransactions]);
 
   return (
     <View style={styles.container}>
@@ -123,18 +130,30 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
             )}
           </View>
 
-          {recentTransactions.length === 0 ? (
+          {recentDateGroups.length === 0 ? (
             <View style={styles.emptyCard}>
               <Ionicons name="receipt-outline" size={32} color={Colors.textTertiary} />
               <Text style={styles.emptyText}>Belum ada transaksi di periode ini</Text>
             </View>
           ) : (
-            recentTransactions.map((tx) => (
-              <TransactionItem
-                key={tx.id}
-                transaction={tx}
-                onEdit={(item) => setEditingTx(item)}
-              />
+            recentDateGroups.map((group) => (
+              <View key={group.date} style={styles.dateGroup}>
+                <View style={styles.dateHeaderRow}>
+                  <View style={styles.dateHeaderLeft}>
+                    <Ionicons name="calendar-outline" size={12} color={Colors.primaryLight} />
+                    <Text style={styles.dateHeaderText}>{group.title}</Text>
+                  </View>
+                </View>
+
+                {group.transactions.map((tx) => (
+                  <TransactionItem
+                    key={tx.id}
+                    transaction={tx}
+                    showOnlyTime={true}
+                    onEdit={(item) => setEditingTx(item)}
+                  />
+                ))}
+              </View>
             ))
           )}
         </View>
@@ -284,5 +303,26 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: Typography.sizes.xs,
     color: Colors.textTertiary,
+  },
+  dateGroup: {
+    marginBottom: Spacing.xs,
+  },
+  dateHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: Spacing.xs,
+    paddingTop: Spacing.xs,
+    paddingBottom: Spacing.xs,
+  },
+  dateHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  dateHeaderText: {
+    fontSize: Typography.sizes.xs,
+    fontWeight: Typography.weights.bold,
+    color: Colors.textSecondary,
+    letterSpacing: 0.2,
   },
 });

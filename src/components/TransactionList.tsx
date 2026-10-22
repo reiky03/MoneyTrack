@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius } from '../constants/theme';
 import { useMoney } from '../context/MoneyContext';
 import { TransactionItem } from './TransactionItem';
+import { groupTransactionsByDate } from '../utils/dateUtils';
 
 interface TransactionListProps {
   onAddPress?: () => void;
@@ -28,6 +29,10 @@ export const TransactionList: React.FC<TransactionListProps> = ({ onAddPress }) 
     const catMatch = category?.name.toLowerCase().includes(query);
     return noteMatch || catMatch;
   });
+
+  const dateGroups = useMemo(() => {
+    return groupTransactionsByDate(displayedTransactions);
+  }, [displayedTransactions]);
 
   return (
     <View style={styles.container}>
@@ -70,7 +75,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({ onAddPress }) 
       </View>
 
       {/* List / Empty State */}
-      {displayedTransactions.length === 0 ? (
+      {dateGroups.length === 0 ? (
         <View style={styles.emptyCard}>
           <View style={styles.emptyIconCircle}>
             <Ionicons name="receipt-outline" size={28} color={Colors.textTertiary} />
@@ -93,8 +98,28 @@ export const TransactionList: React.FC<TransactionListProps> = ({ onAddPress }) 
           )}
         </View>
       ) : (
-        displayedTransactions.map((tx) => (
-          <TransactionItem key={tx.id} transaction={tx} />
+        dateGroups.map((group) => (
+          <View key={group.date} style={styles.dateGroup}>
+            <View style={styles.dateHeaderRow}>
+              <View style={styles.dateHeaderLeft}>
+                <Ionicons name="calendar-outline" size={12} color={Colors.primaryLight} />
+                <Text style={styles.dateHeaderText}>{group.title}</Text>
+              </View>
+              <View style={styles.dateHeaderRight}>
+                <Text style={styles.dateHeaderCount}>
+                  {group.transactions.length} transaksi
+                </Text>
+              </View>
+            </View>
+
+            {group.transactions.map((tx) => (
+              <TransactionItem
+                key={tx.id}
+                transaction={tx}
+                showOnlyTime={true}
+              />
+            ))}
+          </View>
         ))
       )}
     </View>
@@ -213,5 +238,38 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: Typography.sizes.xs,
     fontWeight: Typography.weights.bold,
+  },
+  dateGroup: {
+    marginBottom: Spacing.sm,
+  },
+  dateHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: Spacing.xs,
+    paddingTop: Spacing.sm,
+    paddingBottom: Spacing.xs,
+  },
+  dateHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  dateHeaderText: {
+    fontSize: Typography.sizes.xs,
+    fontWeight: Typography.weights.bold,
+    color: Colors.textSecondary,
+    letterSpacing: 0.2,
+  },
+  dateHeaderRight: {
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: Radius.full,
+  },
+  dateHeaderCount: {
+    fontSize: 10,
+    color: Colors.textTertiary,
+    fontWeight: Typography.weights.medium,
   },
 });

@@ -1,4 +1,4 @@
-import { PeriodType, DateRange } from '../types';
+import { PeriodType, DateRange, Transaction } from '../types';
 
 const MONTH_NAMES_ID = [
   'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
@@ -181,3 +181,70 @@ export function formatPeriodLabel(type: PeriodType, range: DateRange): string {
 
   return `${startDay} ${startMonth} ${startYear} - ${endDay} ${endMonth} ${endYear}`;
 }
+
+export interface TransactionDateGroup {
+  date: string;
+  title: string;
+  isToday: boolean;
+  isYesterday: boolean;
+  transactions: Transaction[];
+  totalExpense: number;
+  totalIncome: number;
+}
+
+/**
+ * Groups an array of transactions by date (YYYY-MM-DD),
+ * sorted chronologically with newest date groups first.
+ */
+export function groupTransactionsByDate(transactions: Transaction[]): TransactionDateGroup[] {
+  if (!transactions || transactions.length === 0) return [];
+
+  // Sort descending by date (newest first)
+  const sorted = [...transactions].sort((a, b) => {
+    const timeA = new Date(a.date).getTime();
+    const timeB = new Date(b.date).getTime();
+    return timeB - timeA;
+  });
+
+  const todayStr = toDateString(new Date());
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = toDateString(yesterday);
+
+  const groupMap = new Map<string, TransactionDateGroup>();
+
+  for (const tx of sorted) {
+    const dateKey = tx.date ? tx.date.slice(0, 10) : todayStr;
+    let group = groupMap.get(dateKey);
+
+    if (!group) {
+      const isToday = dateKey === todayStr;
+      const isYesterday = dateKey === yesterdayStr;
+      const dateFormatted = formatDateIndonesian(dateKey, { showDay: true, shortMonth: false });
+
+      const prefix = isToday ? 'Hari Ini • ' : isYesterday ? 'Kemarin • ' : '';
+      const title = `${prefix}${dateFormatted}`;
+
+      group = {
+        date: dateKey,
+        title,
+        isToday,
+        isYesterday,
+        transactions: [],
+        totalExpense: 0,
+        totalIncome: 0,
+      };
+      groupMap.set(dateKey, group);
+    }
+
+    group.transactions.push(tx);
+    if (tx.type === 'expense') {
+      group.totalExpense += tx.amount;
+    } else if (tx.type === 'income') {
+      group.totalIncome += tx.amount;
+    }
+  }
+
+  return Array.from(groupMap.values());
+}
+

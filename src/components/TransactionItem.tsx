@@ -12,12 +12,14 @@ interface TransactionItemProps {
   transaction: Transaction;
   onPress?: () => void;
   onEdit?: (transaction: Transaction) => void;
+  showOnlyTime?: boolean;
 }
 
 export const TransactionItem: React.FC<TransactionItemProps> = ({
   transaction,
   onPress,
   onEdit,
+  showOnlyTime,
 }) => {
   const { categories, wallets, deleteTransaction, isPrivacyMode } = useMoney();
 
@@ -71,6 +73,20 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
     }
   };
 
+  let timeStr = '';
+  if (transaction.date && transaction.date.includes('T')) {
+    const raw = new Date(transaction.date);
+    if (!isNaN(raw.getTime())) {
+      const h = String(raw.getHours()).padStart(2, '0');
+      const m = String(raw.getMinutes()).padStart(2, '0');
+      timeStr = `${h}:${m}`;
+    }
+  }
+
+  const dateDisplay = showOnlyTime && timeStr
+    ? timeStr
+    : formatDateIndonesian(transaction.date, { showTime: true, shortMonth: true });
+
   return (
     <TouchableOpacity
       style={styles.container}
@@ -115,7 +131,7 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({
           </View>
 
           <Text style={styles.dateText}>
-            {formatDateIndonesian(transaction.date, { showTime: true, shortMonth: true })}
+            {dateDisplay}
           </Text>
         </View>
       </View>

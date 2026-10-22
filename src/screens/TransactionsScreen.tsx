@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -15,6 +15,7 @@ import { TransactionItem } from '../components/TransactionItem';
 import { EditTransactionModal } from '../components/EditTransactionModal';
 import { Transaction, TransactionType } from '../types';
 import { formatRupiah } from '../utils/formatters';
+import { groupTransactionsByDate } from '../utils/dateUtils';
 
 interface TransactionsScreenProps {
   onAddPress: () => void;
@@ -57,6 +58,11 @@ export const TransactionsScreen: React.FC<TransactionsScreenProps> = ({ onAddPre
 
     return true;
   });
+
+  // Group transactions by date
+  const dateGroups = useMemo(() => {
+    return groupTransactionsByDate(displayed);
+  }, [displayed]);
 
   return (
     <View style={styles.container}>
@@ -202,7 +208,7 @@ export const TransactionsScreen: React.FC<TransactionsScreenProps> = ({ onAddPre
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
       >
-        {displayed.length === 0 ? (
+        {dateGroups.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Ionicons name="receipt-outline" size={48} color={Colors.textTertiary} />
             <Text style={styles.emptyTitle}>Tidak ada transaksi</Text>
@@ -211,12 +217,31 @@ export const TransactionsScreen: React.FC<TransactionsScreenProps> = ({ onAddPre
             </Text>
           </View>
         ) : (
-          displayed.map((tx) => (
-            <TransactionItem
-              key={tx.id}
-              transaction={tx}
-              onEdit={(item) => setEditingTx(item)}
-            />
+          dateGroups.map((group) => (
+            <View key={group.date} style={styles.dateGroup}>
+              {/* Date Header Badge */}
+              <View style={styles.dateHeaderRow}>
+                <View style={styles.dateHeaderLeft}>
+                  <Ionicons name="calendar-outline" size={13} color={Colors.primaryLight} />
+                  <Text style={styles.dateHeaderText}>{group.title}</Text>
+                </View>
+                <View style={styles.dateHeaderRight}>
+                  <Text style={styles.dateHeaderCount}>
+                    {group.transactions.length} transaksi
+                  </Text>
+                </View>
+              </View>
+
+              {/* Transactions in Date Group */}
+              {group.transactions.map((tx) => (
+                <TransactionItem
+                  key={tx.id}
+                  transaction={tx}
+                  showOnlyTime={true}
+                  onEdit={(item) => setEditingTx(item)}
+                />
+              ))}
+            </View>
           ))
         )}
 
@@ -559,5 +584,38 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.xs,
     color: Colors.textTertiary,
     textAlign: 'center',
+  },
+  dateGroup: {
+    marginBottom: Spacing.sm,
+  },
+  dateHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: Spacing.xs,
+    paddingTop: Spacing.sm,
+    paddingBottom: Spacing.xs,
+  },
+  dateHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  dateHeaderText: {
+    fontSize: Typography.sizes.xs,
+    fontWeight: Typography.weights.bold,
+    color: Colors.textSecondary,
+    letterSpacing: 0.2,
+  },
+  dateHeaderRight: {
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: Radius.full,
+  },
+  dateHeaderCount: {
+    fontSize: 10,
+    color: Colors.textTertiary,
+    fontWeight: Typography.weights.medium,
   },
 });
