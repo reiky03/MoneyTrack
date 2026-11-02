@@ -135,7 +135,21 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
     if (unit === 'month') d.setMonth(d.getMonth() + amount);
     if (unit === 'day') d.setDate(d.getDate() + amount);
 
-    setCustomDate(toDateString(d));
+    const newDateStr = toDateString(d);
+    setCustomDate(newDateStr);
+
+    const todayStr = toDateString(new Date());
+    const y = new Date();
+    y.setDate(y.getDate() - 1);
+    const yesterdayStr = toDateString(y);
+
+    if (newDateStr === todayStr) {
+      setDateOption('today');
+    } else if (newDateStr === yesterdayStr) {
+      setDateOption('yesterday');
+    } else {
+      setDateOption('custom');
+    }
   };
 
   const handleSave = async () => {
@@ -390,6 +404,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                 ]}
                 onPress={() => {
                   setDateOption('today');
+                  setCustomDate(toDateString(new Date()));
                   setShowDatePicker(false);
                 }}
               >
@@ -410,6 +425,9 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                 ]}
                 onPress={() => {
                   setDateOption('yesterday');
+                  const y = new Date();
+                  y.setDate(y.getDate() - 1);
+                  setCustomDate(toDateString(y));
                   setShowDatePicker(false);
                 }}
               >

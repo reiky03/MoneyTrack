@@ -61,9 +61,8 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
   const [note, setNote] = useState<string>('');
   
   // Date states
-  const [dateOption, setDateOption] = useState<'today' | 'yesterday' | 'custom'>('today');
+  const [dateOption, setDateOption] = useState<'today' | 'yesterday' | 'twoDaysAgo' | 'custom'>('today');
   const [customDate, setCustomDate] = useState<string>(toDateString(new Date()));
-  const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
 
   const [showAddCategoryModal, setShowAddCategoryModal] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -78,7 +77,6 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
       setNote('');
       setDateOption('today');
       setCustomDate(toDateString(new Date()));
-      setShowDatePicker(false);
 
       // Default wallet
       if (wallets.length > 0) {
@@ -130,7 +128,26 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
     if (unit === 'month') d.setMonth(d.getMonth() + amount);
     if (unit === 'day') d.setDate(d.getDate() + amount);
 
-    setCustomDate(toDateString(d));
+    const newDateStr = toDateString(d);
+    setCustomDate(newDateStr);
+
+    const todayStr = toDateString(new Date());
+    const y = new Date();
+    y.setDate(y.getDate() - 1);
+    const yesterdayStr = toDateString(y);
+    const d2 = new Date();
+    d2.setDate(d2.getDate() - 2);
+    const twoDaysAgoStr = toDateString(d2);
+
+    if (newDateStr === todayStr) {
+      setDateOption('today');
+    } else if (newDateStr === yesterdayStr) {
+      setDateOption('yesterday');
+    } else if (newDateStr === twoDaysAgoStr) {
+      setDateOption('twoDaysAgo');
+    } else {
+      setDateOption('custom');
+    }
   };
 
   const handleSave = async () => {
@@ -173,14 +190,19 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
     }
 
     // Determine final ISO date
-    let finalDateIso = new Date().toISOString();
+    const now = new Date();
+    let finalDateIso = now.toISOString();
     if (dateOption === 'yesterday') {
       const y = new Date();
       y.setDate(y.getDate() - 1);
       finalDateIso = y.toISOString();
+    } else if (dateOption === 'twoDaysAgo') {
+      const d2 = new Date();
+      d2.setDate(d2.getDate() - 2);
+      finalDateIso = d2.toISOString();
     } else if (dateOption === 'custom') {
       const parts = customDate.split('-').map(Number);
-      const c = new Date(parts[0], parts[1] - 1, parts[2], 12, 0, 0);
+      const c = new Date(parts[0], parts[1] - 1, parts[2], now.getHours(), now.getMinutes(), now.getSeconds());
       finalDateIso = c.toISOString();
     }
 
@@ -598,16 +620,19 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
               <TouchableOpacity
                 style={[
                   styles.dateChip,
-                  dateOption === 'custom' && styles.dateChipActive,
+                  dateOption === 'twoDaysAgo' && styles.dateChipActive,
                 ]}
                 onPress={() => {
-                  setDateOption('custom');
+                  setDateOption('twoDaysAgo');
+                  const d2 = new Date();
+                  d2.setDate(d2.getDate() - 2);
+                  setCustomDate(toDateString(d2));
                 }}
               >
                 <Text
                   style={[
                     styles.dateChipText,
-                    dateOption === 'custom' && styles.dateChipTextActive,
+                    dateOption === 'twoDaysAgo' && styles.dateChipTextActive,
                   ]}
                 >
                   2 Hari Lalu
@@ -620,7 +645,6 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
               <TouchableOpacity
                 style={styles.dayShiftBtn}
                 onPress={() => {
-                  setDateOption('custom');
                   adjustCustomDate('day', -1);
                 }}
               >
@@ -637,7 +661,6 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
               <TouchableOpacity
                 style={styles.dayShiftBtn}
                 onPress={() => {
-                  setDateOption('custom');
                   adjustCustomDate('day', 1);
                 }}
               >
