@@ -34,8 +34,35 @@ Dilengkapi dengan sistem **Over-The-Air (OTA) Updates** via EAS, sehingga perbai
 
 ---
 
-## 📸 Tampilan Antarmuka (Screenshots)
+## 📱 Tampilan Antarmuka (App Screenshots)
 
+<div align="center">
+  <table border="0" style="border: none;">
+    <tr>
+      <td align="center" width="33%">
+        <b>🚀 1. Welcome Screen</b><br />
+        <sub>Onboarding & pengenalan fitur offline-first</sub><br /><br />
+        <img src="docs/screenshots/screen-welcome.png" alt="MoneyTrack Welcome Screen" width="98%" style="border-radius: 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.4);" />
+      </td>
+      <td align="center" width="33%">
+        <b>📊 2. Dashboard Utama</b><br />
+        <sub>Saldo bersih, kartu dompet & grafik donat</sub><br /><br />
+        <img src="docs/screenshots/screen-dashboard.png" alt="MoneyTrack Dashboard Screen" width="98%" style="border-radius: 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.4);" />
+      </td>
+      <td align="center" width="33%">
+        <b>💳 3. Riwayat Transaksi</b><br />
+        <sub>Grup per tanggal, filter & mutasi kas</sub><br /><br />
+        <img src="docs/screenshots/screen-transactions.png" alt="MoneyTrack Transactions Screen" width="98%" style="border-radius: 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.4);" />
+      </td>
+    </tr>
+  </table>
+</div>
+
+<br />
+
+<details>
+<summary><b>🔍 Klik untuk Melihat Detail Komponen Kartu (Dashboard & Kategori)</b></summary>
+<br />
 <div align="center">
   <table border="0" style="border: none;">
     <tr>
@@ -50,6 +77,7 @@ Dilengkapi dengan sistem **Over-The-Air (OTA) Updates** via EAS, sehingga perbai
     </tr>
   </table>
 </div>
+</details>
 
 ---
 
