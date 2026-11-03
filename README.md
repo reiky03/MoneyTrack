@@ -18,7 +18,7 @@
 
   <p align="center">
     <a href="https://expo.dev/artifacts/eas/t_Hk9hLB3agWNty34L_apTekRRP_1hlgZvNXkrchDsE.apk">
-      <img src="https://img.shields.io/badge/Download%20APK-v1.2.0-6366F1?style=for-the-badge&logo=android&logoColor=white" alt="Download APK" />
+      <img src="https://img.shields.io/badge/Download%20APK-v1.2.1-6366F1?style=for-the-badge&logo=android&logoColor=white" alt="Download APK" />
     </a>
   </p>
 
@@ -188,7 +188,7 @@ npx tsc --noEmit
 
 Anda dapat langsung mengunduh dan memasang file APK MoneyTrack di perangkat Android Anda:
 
-* 📥 **Versi Terbaru**: [MoneyTrack v1.2.0 APK (79 MB)](https://expo.dev/artifacts/eas/t_Hk9hLB3agWNty34L_apTekRRP_1hlgZvNXkrchDsE.apk)
+* 📥 **Versi Terbaru**: [MoneyTrack v1.2.1 APK (79 MB)](https://expo.dev/artifacts/eas/t_Hk9hLB3agWNty34L_apTekRRP_1hlgZvNXkrchDsE.apk) (Mendukung OTA Update Otomatis)
 * 📋 **Detail Build EAS**: [EAS Build Dashboard](https://expo.dev/accounts/siddiq03/projects/moneytrack/builds/f3fe01c5-a708-40d7-82a1-f2c588b32a0f)
 
 ---
