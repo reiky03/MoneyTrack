@@ -25,7 +25,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSettings, onOpenWallets })
     if (!Updates.isEnabled) {
       showAlert({
         title: `MoneyTrack ${APP_VERSION} 🎉`,
-        message: 'Aplikasi kamu saat ini sudah menggunakan versi paling mutakhir (v1.2.0).',
+        message: `Aplikasi kamu saat ini sudah menggunakan versi paling mutakhir (${APP_VERSION}).`,
         type: 'info',
       });
       return;

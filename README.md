@@ -111,7 +111,7 @@ Dilengkapi dengan sistem **Over-The-Air (OTA) Updates** via EAS, sehingga perbai
 * Tombol sensor mata di navbar atas: Dalam satu ketukan, seluruh angka saldo dan mutasi disamarkan menjadi `Rp ••••••` untuk keamanan saat membuka aplikasi di tempat umum.
 
 ### 7. 🚀 In-App OTA Update & Navbar Quick-Check
-* **Pill Versi & Cek Pembaruan di Navbar Atas**: Tersemat anggun di samping tombol privasi dengan status versi aktif (`v1.2.0`). Cukup 1 ketukan untuk memeriksa ketersediaan pembaruan via internet.
+* **Pill Versi & Cek Pembaruan di Navbar Atas**: Tersemat anggun di samping tombol privasi dengan status versi aktif (`v1.2.1`). Cukup 1 ketukan untuk memeriksa ketersediaan pembaruan via internet.
 * **Modal Pembaruan Interaktif**: Jika pembaruan tersedia, muncul pop-up kustom bertema *dark fintech* yang memberikan kendali penuh pada pengguna: langsung unduh (*Perbarui Sekarang*) atau tunda (*Nanti Saja*).
 
 ### 8. ⌨️ Keyboard Auto-Lift & Input Ergonomis
@@ -195,7 +195,11 @@ Anda dapat langsung mengunduh dan memasang file APK MoneyTrack di perangkat Andr
 
 ## 📋 Catatan Rilis (Changelog)
 
-### v1.2.0 (Pembaruan Terkini)
+### v1.2.1 (Pembaruan Terkini)
+* ⏱️ **Perbaikan Kalkulasi Tanggal "2 Hari Lalu"**: Memperbaiki logika pemilihan tanggal mundur 2 hari pada modal Tambah & Edit Transaksi agar akurat menghitung pergantian bulan (misal: 2 Nov mundur menjadi 31 Okt) dan status chip aktif menyala dengan benar.
+* 🏷️ **Sinkronisasi Nomor Versi v1.2.1**: Pembaruan badge versi pada navbar atas dan splash screen.
+
+### v1.2.0
 * 📅 **Pengelompokan Transaksi Berdasarkan Tanggal**: Riwayat transaksi kini tersusun rapi per hari dengan penanda tanggal jelas (*cth: Senin, 12 Oktober 2026*) dan jumlah transaksi harian.
 * ✨ **Pill Versi & Cek Pembaruan Navbar**: Tombol cek OTA update dan indikator versi dipindahkan ke navbar atas layar utama dengan desain ramping.
 * 🚀 **In-App Update Prompt Modal**: Pop-up konfirmasi pembaruan interaktif dengan opsi *Perbarui Sekarang* atau *Nanti Saja*.

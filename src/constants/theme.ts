@@ -91,5 +91,5 @@ export const Radius = {
   full: 9999,
 };
 
-export const APP_VERSION = 'v1.2.0';
+export const APP_VERSION = 'v1.2.1';
 
